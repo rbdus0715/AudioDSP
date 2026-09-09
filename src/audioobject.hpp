@@ -16,6 +16,8 @@ private:
     size_t m_audioLength;
     SampleInfo m_sampleInfo;
     IAudioData* m_audioData;
+
+    size_t PosToAbsolute(double pos);
 };
 
 #endif
