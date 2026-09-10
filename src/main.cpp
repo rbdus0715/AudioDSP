@@ -8,7 +8,7 @@
 #include "sdl/sdlaudiodevice.hpp"
 #include "sdl/sdlaudiocontext.hpp"
 
-#define FILE_PATH "./res/audio/testClip.wav"
+#define FILE_PATH "../assets/audio/test.wav"
 
 int main(int argc, char** argv) {
 	SDL_Init(SDL_INIT_AUDIO);
@@ -25,6 +25,8 @@ int main(int argc, char** argv) {
 	AudioObject sound(info, data);
 
 	char in = 0;
+
+	std::cout << "Press 'a' to play, 's' to pause, 'd' to stop, 'q' to quit" << std::endl;
 	while(in != 'q') 
 	{
 		std::cin >> in;

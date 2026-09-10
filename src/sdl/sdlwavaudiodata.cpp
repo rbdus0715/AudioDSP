@@ -52,7 +52,7 @@ size_t SDLWAVAudioData::GenerateSamples(float* stream, size_t streamLength, size
     float factor = (float)info.volume * 1.0f / 32768.0f;
     for(Uint32 i = 0; i < length; i++)
     {
-        stream[i] = samples[(Uint32)sampleIndex] * factor;
+        stream[i] = (samples[(size_t)sampleIndex]) * factor;
         sampleIndex += pitch;
     }
 

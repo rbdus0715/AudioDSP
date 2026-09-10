@@ -1,7 +1,10 @@
 #include "audioobject.hpp"
 
-AudioObject::AudioObject(const SampleInfo& info, IAudioData* data)
-: m_audioPos(0), m_audioLength(0), m_sampleInfo(info), m_audioData(data) {}
+AudioObject::AudioObject(const SampleInfo& info, IAudioData* data):
+    m_audioPos(0), 
+    m_audioLength(data->GetAudioLength()), 
+    m_sampleInfo(info), 
+    m_audioData(data) {}
 
 bool AudioObject::GenerateSamples(float* stream, size_t streamLength)
 {

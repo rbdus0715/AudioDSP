@@ -3,16 +3,15 @@
 ### requirements
 - SDL2
 
-### build
-
+### build & run
 ```bash
 mkdir -p build && cd build
 cmake ..
 make
 ```
 
-### run
 ```bash
 #/build
 ./AudioDSP
 ```
+- place test.wav in assets/audio/ directory
