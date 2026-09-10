@@ -10,11 +10,8 @@ class SDLWAVAudioData: public IAudioData
 public:
     SDLWAVAudioData(const std::string& filename, bool streamFromFile);
     virtual ~SDLWAVAudioData();
-    SDLWAVAudioData(SDLWAVAudioData& other) = delete;
-    void operator=(const SDLWAVAudioData& other) = delete;
-
     virtual size_t GenerateSamples(float* stream, size_t streamLength, size_t pos, const SampleInfo& info);
-
+    virtual size_t GetAudioLength();
 private:
     Uint8* m_pos;
     Uint8* m_start;
