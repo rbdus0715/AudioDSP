@@ -15,7 +15,7 @@ find_package(SDL2 REQUIRED)
 
 file(GLOB_RECURSE SRCS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/sdl/*.cpp"
 )
 
 add_executable(AudioDSP ${SRCS})
