@@ -11,56 +11,56 @@ SDLWAVAudioData::SDLWAVAudioData(const std::string& filename, bool streamFromFil
         throw filename;
     }
 
-    m_pos = wavStart;
-    m_start = wavStart;
-    m_end = m_start + wavLength;
+    m_rawStart = wavStart;
+    m_samples = (Sint16*)wavStart;
+    m_numChannels = wavSpec.channels;
+    m_numFrames = wavLength / (sizeof(Sint16) * (size_t)m_numChannels);
 }
 
 SDLWAVAudioData::~SDLWAVAudioData()
 {
-    SDL_FreeWAV(m_start);
+    SDL_FreeWAV(m_rawStart);
 }
 
 /**
  * Generate samples from the audio data.
- * @param stream: pointer to the buffer to store the samples
- * @param streamLength: length of the buffer
- * @param pos: position in the audio data
+ * @param buffer: planar 오디오 버퍼. 파일은 인터리브 상태이므로 여기서 디인터리브해서 채운다.
+ * @param numFrames: 요청한 프레임(채널 묶음) 개수
+ * @param pos: 오디오 데이터 내 위치 (프레임 단위)
  * @param info: information about the sample
- * @return length of the samples generated
+ * @return 다음 호출에 쓸 위치 (프레임 단위), 끝났으면 (size_t)-1
  */
-size_t SDLWAVAudioData::GenerateSamples(float* stream, size_t streamLength, size_t pos, const SampleInfo& info)
+size_t SDLWAVAudioData::GenerateSamples(AudioBuffer& buffer, size_t numFrames, size_t pos, const SampleInfo& info)
 {
     float pitch = (float)info.pitch;
-    m_pos = m_start + pos;
 
-    if(m_pos >= m_end || m_pos < m_start) 
+    if(pos >= m_numFrames)
     {
         return (size_t)-1;
     }
 
     // select shorter length between remaining length and requested length
-    Uint32 length = (Uint32)streamLength;
-    Uint32 lengthLeft = (Uint32)((m_end - m_pos)/pitch);
-    length = (length > lengthLeft ? lengthLeft : length);
-
-
-    Sint16* samples = (Sint16*)m_pos;
-    float sampleIndex = 0;
+    size_t framesLeft = (size_t)((float)(m_numFrames - pos) / pitch);
+    size_t framesToGenerate = (numFrames > framesLeft ? framesLeft : numFrames);
 
     // normalize volume (32768: max value of Sint16)
     float factor = (float)info.volume * 1.0f / 32768.0f;
-    for(Uint32 i = 0; i < length; i++)
+    float sampleIndex = (float)pos;
+
+    for(size_t i = 0; i < framesToGenerate; i++)
     {
-        stream[i] = (samples[(size_t)sampleIndex]) * factor;
+        size_t frame = (size_t)sampleIndex;
+        for(int ch = 0; ch < m_numChannels; ch++)
+        {
+            buffer.GetWritePointer(ch)[i] = m_samples[frame * (size_t)m_numChannels + (size_t)ch] * factor;
+        }
         sampleIndex += pitch;
     }
 
-    m_pos = (Uint8*)(samples + (size_t)sampleIndex);
-    return (size_t)(m_pos - m_start);
+    return (size_t)sampleIndex;
 }
 
 size_t SDLWAVAudioData::GetAudioLength()
 {
-    return (size_t)(m_end - m_start);
+    return m_numFrames;
 }

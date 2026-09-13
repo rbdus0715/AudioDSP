@@ -7,6 +7,7 @@
 
 #include "sdl/sdlaudiodevice.hpp"
 #include "sdl/sdlaudiocontext.hpp"
+#include "dsp/basic_delay.hpp"
 
 #define FILE_PATH "../assets/audio/test.wav"
 
@@ -23,6 +24,9 @@ int main(int argc, char** argv) {
 	info.pitch = 1.0;
 
 	AudioObject sound(info, data);
+
+	BasicDelay delay(44100, 0.3, 0.35f, 0.3f);
+	sound.GetDSPChain().AddEffect(&delay);
 
 	char in = 0;
 

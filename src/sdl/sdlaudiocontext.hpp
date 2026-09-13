@@ -2,6 +2,7 @@
 #define SDL_AUDIO_CONTEXT_HPP
 
 #include "../iaudiocontext.hpp"
+#include "../audiobuffer.hpp"
 #include <vector>
 #include <SDL2/SDL.h>
 
@@ -19,7 +20,9 @@ public:
 
 private:
     SDL_AudioDeviceID m_device;
-    std::vector<float> m_stream;
+    int m_numChannels;
+    // 내부 처리는 전부 planar. 인터리브 변환은 GenerateSamples 끝에서 한 번만 일어난다.
+    AudioBuffer m_buffer;
     // 재생중인 오디오 객체들을 저장하는 벡터
     std::vector<AudioObject*> m_playingAudio;
 

@@ -6,9 +6,9 @@ AudioObject::AudioObject(const SampleInfo& info, IAudioData* data):
     m_sampleInfo(info), 
     m_audioData(data) {}
 
-bool AudioObject::GenerateSamples(float* stream, size_t streamLength)
+bool AudioObject::GenerateSamples(AudioBuffer& buffer, size_t numFrames)
 {
-    m_audioPos = m_audioData->GenerateSamples(stream, streamLength, m_audioPos, m_sampleInfo);
+    m_audioPos = m_audioData->GenerateSamples(buffer, numFrames, m_audioPos, m_sampleInfo);
 
     // audio buffer is finished.
     if(m_audioPos == (size_t)-1)
@@ -16,6 +16,8 @@ bool AudioObject::GenerateSamples(float* stream, size_t streamLength)
         m_audioPos = 0;
         return false;
     }
+
+    m_dspChain.Process(buffer, numFrames);
     return true;
 }
 

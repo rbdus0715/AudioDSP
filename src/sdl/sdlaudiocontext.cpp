@@ -6,14 +6,14 @@ static void SDLAudioContext_AudioCallback(void* userdata, Uint8* streamIn, int l
     context->GenerateSamples(streamIn, length);
 }
 
-SDLAudioContext::SDLAudioContext()
+SDLAudioContext::SDLAudioContext(): m_numChannels(2)
 {
     SDL_AudioSpec spec;
 
     SDL_zero(spec);
     spec.freq = 44100;
     spec.format = AUDIO_S16SYS;
-    spec.channels = 2;
+    spec.channels = (Uint8)m_numChannels;
     spec.samples = 2048;
     spec.callback = SDLAudioContext_AudioCallback;
     spec.userdata = this;
@@ -67,45 +67,43 @@ void SDLAudioContext::StopAudio(AudioObject& ao)
 
 void SDLAudioContext::GenerateSamples(Uint8* streamIn, int streamInLen)
 {
-	size_t streamLen = (size_t)(streamInLen/2);
-
-	m_stream.reserve(streamLen);
-	// float* floatStream = *(float**)(&m_stream);
-	float* floatStream = m_stream.data();
+	size_t totalSamples = (size_t)(streamInLen/2);
+	size_t numFrames = totalSamples / (size_t)m_numChannels;
 
 	// 무음 처리
-	for(size_t i = 0; i < streamLen; i++)
-	{
-		floatStream[i] = 0.0f;
-	}
+	m_buffer.SetSize(m_numChannels, numFrames);
+	m_buffer.Clear();
 
-	// 믹싱
+	// 믹싱 (planar 상태로 처리)
 	std::vector<AudioObject*>::iterator it = m_playingAudio.begin();
 	std::vector<AudioObject*>::iterator end = m_playingAudio.end();
 	for(; it != end; ++it)
 	{
-		if(!(*it)->GenerateSamples(floatStream, streamLen))
+		if(!(*it)->GenerateSamples(m_buffer, numFrames))
 		{
 			RemoveAudio(*(*it));
 		}
 	}
 
-	// 클리핑 방지
+	// 클리핑 방지 + planar -> interleaved 변환 (하드웨어로 넘기는 경계에서 한 번만)
 	Sint16* stream = (Sint16*)streamIn;
-	for(size_t i = 0; i < streamLen; i++)
+	for(size_t frame = 0; frame < numFrames; frame++)
 	{
-		float val = floatStream[i];
-
-		if(val > 1.0f)
+		for(int ch = 0; ch < m_numChannels; ch++)
 		{
-			val = 1.0f;
-		}
-		else if(val < -1.0f)
-		{
-			val = -1.0f;
-		}
+			float val = m_buffer.GetReadPointer(ch)[frame];
 
-		stream[i] = (Sint16)(val * 32767);
+			if(val > 1.0f)
+			{
+				val = 1.0f;
+			}
+			else if(val < -1.0f)
+			{
+				val = -1.0f;
+			}
+
+			stream[frame * (size_t)m_numChannels + (size_t)ch] = (Sint16)(val * 32767);
+		}
 	}
 }
 
