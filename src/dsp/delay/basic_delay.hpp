@@ -1,7 +1,7 @@
 #ifndef BASIC_DELAY_HPP
 #define BASIC_DELAY_HPP
 
-#include "idspeffect.hpp"
+#include "../idspeffect.hpp"
 #include <vector>
 
 class BasicDelay : public IDSPEffect
