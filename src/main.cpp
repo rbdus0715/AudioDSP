@@ -8,7 +8,6 @@
 #include "sdl/sdlaudiodevice.hpp"
 #include "sdl/sdlaudiocontext.hpp"
 #include "dsp/delay/basic_delay.hpp"
-
 #define FILE_PATH "../assets/audio/test.wav"
 
 int main(int argc, char** argv) {

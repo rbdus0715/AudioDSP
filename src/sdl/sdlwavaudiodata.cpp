@@ -10,7 +10,10 @@ SDLWAVAudioData::SDLWAVAudioData(const std::string& filename, bool streamFromFil
     {
         throw filename;
     }
-
+    Uint8 bitDepth = SDL_AUDIO_BITSIZE(wavSpec.format);
+    if(bitDepth != 16) {
+        throw std::runtime_error("Unsupported bit depth: " + std::to_string(bitDepth));
+    }
     m_rawStart = wavStart;
     m_samples = (Sint16*)wavStart;
     m_numChannels = wavSpec.channels;
