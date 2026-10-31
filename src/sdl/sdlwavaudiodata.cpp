@@ -1,4 +1,5 @@
 #include "sdlwavaudiodata.hpp"
+#include <algorithm>
 
 SDLWAVAudioData::SDLWAVAudioData(const std::string& filename, bool streamFromFile)
 {
@@ -53,7 +54,7 @@ size_t SDLWAVAudioData::GenerateSamples(AudioBuffer& buffer, size_t numFrames, s
     for(size_t i = 0; i < framesToGenerate; i++)
     {
         size_t frame = (size_t)sampleIndex;
-        for(int ch = 0; ch < m_numChannels; ch++)
+        for(int ch = 0; ch < std::min(m_numChannels, buffer.GetNumChannels()); ch++)
         {
             buffer.GetWritePointer(ch)[i] = m_samples[frame * (size_t)m_numChannels + (size_t)ch] * factor;
         }
