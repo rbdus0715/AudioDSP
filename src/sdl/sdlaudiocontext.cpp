@@ -76,12 +76,11 @@ void SDLAudioContext::GenerateSamples(Uint8* streamIn, int streamInLen)
 
 	// 믹싱 (planar 상태로 처리)
 	std::vector<AudioObject*>::iterator it = m_playingAudio.begin();
-	std::vector<AudioObject*>::iterator end = m_playingAudio.end();
-	for(; it != end; ++it)
-	{
-		if(!(*it)->GenerateSamples(m_buffer, numFrames))
-		{
-			RemoveAudio(*(*it));
+	while(it != m_playingAudio.end()) {
+		if(!(*it)->GenerateSamples(m_buffer, numFrames)) {
+			it = m_playingAudio.erase(it);
+		} else {
+			++it;
 		}
 	}
 
