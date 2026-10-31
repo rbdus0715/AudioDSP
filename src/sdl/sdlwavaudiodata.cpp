@@ -56,7 +56,7 @@ size_t SDLWAVAudioData::GenerateSamples(AudioBuffer& buffer, size_t numFrames, s
         size_t frame = (size_t)sampleIndex;
         for(int ch = 0; ch < std::min(m_numChannels, buffer.GetNumChannels()); ch++)
         {
-            buffer.GetWritePointer(ch)[i] = m_samples[frame * (size_t)m_numChannels + (size_t)ch] * factor;
+            buffer.GetWritePointer(ch)[i] += m_samples[frame * (size_t)m_numChannels + (size_t)ch] * factor;
         }
         sampleIndex += pitch;
     }
