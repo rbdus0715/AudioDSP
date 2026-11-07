@@ -6,12 +6,12 @@ static void SDLAudioContext_AudioCallback(void* userdata, Uint8* streamIn, int l
     context->GenerateSamples(streamIn, length);
 }
 
-SDLAudioContext::SDLAudioContext(): m_numChannels(2)
+SDLAudioContext::SDLAudioContext(): m_numChannels(2), m_sampleRate(44100)
 {
     SDL_AudioSpec spec;
 
     SDL_zero(spec);
-    spec.freq = 44100;
+    spec.freq = m_sampleRate;
     spec.format = AUDIO_S16SYS;
     spec.channels = (Uint8)m_numChannels;
     spec.samples = 2048;
@@ -33,7 +33,7 @@ SDLAudioContext::~SDLAudioContext()
 	SDL_CloseAudioDevice(m_device);
 }
 
-void SDLAudioContext::PlayAudio(AudioObject& ao)
+void SDLAudioContext::PlayAudio(IAudioSource& ao)
 {
 	SDL_LockAudioDevice(m_device);
 
@@ -44,7 +44,7 @@ void SDLAudioContext::PlayAudio(AudioObject& ao)
 	SDL_UnlockAudioDevice(m_device);
 }
 
-void SDLAudioContext::PauseAudio(AudioObject& ao)
+void SDLAudioContext::PauseAudio(IAudioSource& ao)
 {
 	SDL_LockAudioDevice(m_device);
 
@@ -53,13 +53,13 @@ void SDLAudioContext::PauseAudio(AudioObject& ao)
 	SDL_UnlockAudioDevice(m_device);
 }
 
-void SDLAudioContext::StopAudio(AudioObject& ao)
+void SDLAudioContext::StopAudio(IAudioSource& ao)
 {
 	SDL_LockAudioDevice(m_device);
 
 	if(RemoveAudio(ao))
 	{
-		ao.SetPos(0.0);
+		ao.Rewind();
 	}
 
 	SDL_UnlockAudioDevice(m_device);
@@ -75,7 +75,7 @@ void SDLAudioContext::GenerateSamples(Uint8* streamIn, int streamInLen)
 	m_buffer.Clear();
 
 	// 믹싱 (planar 상태로 처리)
-	std::vector<AudioObject*>::iterator it = m_playingAudio.begin();
+	std::vector<IAudioSource*>::iterator it = m_playingAudio.begin();
 	while(it != m_playingAudio.end()) {
 		if(!(*it)->GenerateSamples(m_buffer, numFrames)) {
 			it = m_playingAudio.erase(it);
@@ -106,10 +106,10 @@ void SDLAudioContext::GenerateSamples(Uint8* streamIn, int streamInLen)
 	}
 }
 
-bool SDLAudioContext::RemoveAudio(AudioObject& ao)
+bool SDLAudioContext::RemoveAudio(IAudioSource& ao)
 {
-	std::vector<AudioObject*>::iterator it = m_playingAudio.begin();
-	std::vector<AudioObject*>::iterator end = m_playingAudio.end();
+	std::vector<IAudioSource*>::iterator it = m_playingAudio.begin();
+	std::vector<IAudioSource*>::iterator end = m_playingAudio.end();
 
 	for(; it != end; ++it)
 	{

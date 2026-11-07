@@ -8,13 +8,14 @@
 #include "sdl/sdlaudiodevice.hpp"
 #include "sdl/sdlaudiocontext.hpp"
 #include "dsp/delay/basic_delay.hpp"
+#include "synth/synth.hpp"
 #define FILE_PATH "../assets/audio/test.wav"
 
 int main(int argc, char** argv) {
 	SDL_Init(SDL_INIT_AUDIO);
 
 	IAudioDevice* device = new SDLAudioDevice();
-	IAudioContext* context = new SDLAudioContext();
+	SDLAudioContext* context = new SDLAudioContext();
 
 	IAudioData* data = device->CreateAudioFromFile(FILE_PATH);
 
@@ -27,9 +28,13 @@ int main(int argc, char** argv) {
 	BasicDelay delay(44100, 0.3, 0.35f, 0.3f);
 	sound.GetDSPChain().AddEffect(&delay);
 
+	Synth synth(context->GetSampleRate());
+
 	char in = 0;
 
-	std::cout << "Press 'a' to play, 's' to pause, 'd' to stop, 'q' to quit" << std::endl;
+	std::cout << "[file]  'a' play, 's' pause, 'd' stop" << std::endl;
+	std::cout << "[synth] 'z' on, 'x' off" << std::endl;
+	std::cout << "'q' quit" << std::endl;
 	while(in != 'q') 
 	{
 		std::cin >> in;
@@ -43,6 +48,12 @@ int main(int argc, char** argv) {
 				break;
 			case 'd':
 				context->StopAudio(sound);
+				break;
+			case 'z':
+				context->PlayAudio(synth);
+				break;
+			case 'x':
+				context->PauseAudio(synth);
 				break;
 		}
 	}
