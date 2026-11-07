@@ -29,17 +29,33 @@ int main(int argc, char** argv) {
 	sound.GetDSPChain().AddEffect(&delay);
 
 	Synth synth(context->GetSampleRate());
+	context->PlayAudio(synth);
+
+	// 숫자 키 1~8 -> 다장조 음계 (C4=60 ... C5=72)
+	const int keyToNote[8] = {60, 62, 64, 65, 67, 69, 71, 72};
+	int lastNote = -1;
 
 	char in = 0;
 
 	std::cout << "[file]  'a' play, 's' pause, 'd' stop" << std::endl;
-	std::cout << "[synth] 'z' on, 'x' off" << std::endl;
-	std::cout << "'q' quit" << std::endl;
-	while(in != 'q') 
+	std::cout << "[synth] '1'~'8' note on (C D E F G A B C), '0' note off" << std::endl;
+	std::cout << "'q' quit  (Enter after press key)" << std::endl;
+	while(in != 'q')
 	{
 		std::cin >> in;
+
+		if(in >= '1' && in <= '8')
+		{
+			lastNote = keyToNote[in - '1'];
+			synth.NoteOn(lastNote, 1.0f);
+			continue;
+		}
+
 		switch(in)
 		{
+			case '0':
+				synth.NoteOff(lastNote);
+				break;
 			case 'a':
 				context->PlayAudio(sound);
 				break;
@@ -48,12 +64,6 @@ int main(int argc, char** argv) {
 				break;
 			case 'd':
 				context->StopAudio(sound);
-				break;
-			case 'z':
-				context->PlayAudio(synth);
-				break;
-			case 'x':
-				context->PauseAudio(synth);
 				break;
 		}
 	}
