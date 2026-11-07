@@ -12,21 +12,23 @@ public:
     SDLAudioContext();
     virtual ~SDLAudioContext();
 
-    virtual void PlayAudio(AudioObject& ao);
-    virtual void StopAudio(AudioObject& ao);
-    virtual void PauseAudio(AudioObject& ao);
+    virtual void PlayAudio(IAudioSource& ao);
+    virtual void StopAudio(IAudioSource& ao);
+    virtual void PauseAudio(IAudioSource& ao);
 
     void GenerateSamples(Uint8* stream, int streamLen);
+    int GetSampleRate() const { return m_sampleRate; }
 
 private:
     SDL_AudioDeviceID m_device;
     int m_numChannels;
+    int m_sampleRate;
     // 내부 처리는 전부 planar. 인터리브 변환은 GenerateSamples 끝에서 한 번만 일어난다.
     AudioBuffer m_buffer;
     // 재생중인 오디오 객체들을 저장하는 벡터
-    std::vector<AudioObject*> m_playingAudio;
+    std::vector<IAudioSource*> m_playingAudio;
 
-    bool RemoveAudio(AudioObject& ao);
+    bool RemoveAudio(IAudioSource& ao);
 
     // 복사생성자와 대입생성자를 private 메소드로 지정하여
 	// 자원 중복 해제 문제와 하나의 오디오 장치를 

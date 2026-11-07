@@ -5,12 +5,14 @@
 #include "sampleinfo.hpp"
 #include "audiobuffer.hpp"
 #include "dsp/dspchain.hpp"
+#include "iaudiosource.hpp"
 
-class AudioObject
+class AudioObject : public IAudioSource
 {
 public:
     AudioObject(const SampleInfo& info, IAudioData* data);
-    bool GenerateSamples(AudioBuffer& buffer, size_t numFrames);
+    bool GenerateSamples(AudioBuffer& buffer, size_t numFrames) override;
+    void Rewind() override { SetPos(0.0); }
     void SetPos(double pos);
     DSPChain& GetDSPChain() { return m_dspChain; }
 

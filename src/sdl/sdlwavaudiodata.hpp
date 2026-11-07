@@ -1,7 +1,7 @@
 #ifndef SDL_WAV_AUDIO_DATA_HPP
 #define SDL_WAV_AUDIO_DATA_HPP
 
-#include "iaudiocontext.hpp"
+#include "iaudiodata.hpp"
 #include <SDL2/SDL.h>
 #include <string>
 
