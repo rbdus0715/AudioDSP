@@ -15,6 +15,7 @@ target_link_libraries(AudioDSPSynth
 )
 
 smtg_target_configure_version_file(AudioDSPSynth)
+target_include_directories(AudioDSPSynth PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 
 if(SMTG_MAC)
     smtg_target_set_bundle(AudioDSPSynth
