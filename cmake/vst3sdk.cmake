@@ -9,6 +9,7 @@ FetchContent_Declare(vst3sdk
     GIT_SHALLOW    TRUE
     GIT_SUBMODULES base cmake pluginterfaces public.sdk
     GIT_PROGRESS   TRUE
+    PATCH_COMMAND sed -i "" -e "s/getVariable<AudioUnit> (VarNamePlugView)/getVariable<AudioUnit> (VarNameAudioUnit)/" -e "s/[[]self dealloc[]]/[self release]/" public.sdk/source/vst/auwrapper/aucocoaview.mm
 )
 FetchContent_MakeAvailable(vst3sdk)
 
