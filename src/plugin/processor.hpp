@@ -2,6 +2,8 @@
 #define PROCESSOR_HPP
 
 #include "audiobuffer.hpp"
+#include "cids.h"
+#include "pluginterfaces/vst/ivstparameterchanges.h"
 #include "public.sdk/source/vst/vstaudioeffect.h"
 #include "synth/synth.hpp"
 #include <memory>
@@ -40,6 +42,9 @@ private:
   // 알게되니 그때 만들기 위해 포인터로 둠
   std::unique_ptr<Synth> m_synth;
   AudioBuffer m_buffer; // Synth가 쓸 작업용 버퍼
+  double m_volume = kVolumeRange.def;
+  double m_attack = kAttackRange.def;
+  double m_release = kReleaseRange.def;
 };
 
 } // namespace AudioDSP

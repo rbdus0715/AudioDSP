@@ -27,6 +27,9 @@ tresult PLUGIN_API SynthProcessor::setupProcessing(Vst::ProcessSetup &setup) {
   // setup.sampleRate          : 샘플레이트 (double)
   // setup.maxSamplesPerBlock  : process() 한 번에 올 수 있는 최대 샘플 수
   m_synth = std::make_unique<Synth>(static_cast<int>(setup.sampleRate));
+  m_synth->SetVolume(m_volume);
+  m_synth->SetAttack(m_attack);
+  m_synth->SetRelease(m_release);
   m_buffer.SetSize(2, setup.maxSamplesPerBlock);
 
   return AudioEffect::setupProcessing(setup);
@@ -38,7 +41,39 @@ SynthProcessor::canProcessSampleSize(int32 symbolicSampleSize) {
 }
 
 tresult PLUGIN_API SynthProcessor::process(Vst::ProcessData &data) {
-  // ---- 1. 이벤트: DAW가 보낸 노트를 Synth에 전달 ----
+  if (data.inputParameterChanges) {
+    int32 numParams = data.inputParameterChanges->getParameterCount();
+    for (int32 i = 0; i < numParams; i++) {
+      Vst::IParamValueQueue *queue =
+          data.inputParameterChanges->getParameterData(i);
+      if (!queue)
+        continue;
+
+      Vst::ParamValue value;
+      int32 sampleOffset;
+      int32 last = queue->getPointCount() - 1;
+      if (queue->getPoint(last, sampleOffset, value) != kResultOk)
+        continue;
+
+      switch (queue->getParameterId()) {
+      case kParamVolume:
+        m_volume = kVolumeRange.ToPlain(value);
+        m_synth->SetVolume(m_volume);
+        break;
+      case kParamAttack:
+        m_attack = kAttackRange.ToPlain(value);
+        m_synth->SetAttack(m_attack);
+        break;
+
+      case kParamRelease:
+        m_release = kReleaseRange.ToPlain(value);
+        m_synth->SetRelease(m_release);
+        break;
+      }
+    }
+  }
+
+  // 이벤트: DAW가 보낸 노트를 Synth에 전달
   if (data.inputEvents) {
     int32 count = data.inputEvents->getEventCount();
     for (int32 i = 0; i < count; i++) {
@@ -57,15 +92,15 @@ tresult PLUGIN_API SynthProcessor::process(Vst::ProcessData &data) {
     }
   }
 
-  // ---- 2. 출력할 곳이 없으면 여기서 끝 ----
+  // 출력할 곳이 없으면 여기서 끝
   if (data.numSamples == 0 || data.numOutputs == 0)
     return kResultOk;
 
-  // ---- 3. 내 버퍼에 렌더링 ----
+  // 버퍼에 렌더링
   m_buffer.Clear();
   m_synth->GenerateSamples(m_buffer, data.numSamples);
 
-  // ---- 4. 내 버퍼 -> DAW 버퍼로 복사 ----
+  // 버퍼 -> DAW 버퍼로 복사
   Vst::AudioBusBuffers &out = data.outputs[0];
   for (int32 ch = 0; ch < out.numChannels; ch++) {
     std::memcpy(out.channelBuffers32[ch], m_buffer.GetReadPointer(ch),

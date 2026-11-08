@@ -36,6 +36,8 @@ public:
     }
     return m_level;
   }
+  void SetAttack(double sec) { m_attackSec = sec; }
+  void SetRelease(double sec) { m_releaseSec = sec; }
 
 private:
   int m_sampleRate;

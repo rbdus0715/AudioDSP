@@ -11,6 +11,9 @@ public:
   bool GenerateSamples(AudioBuffer &buffer, size_t numFrames) override;
   void NoteOn(int note, float velocity);
   void NoteOff(int note);
+  void SetVolume(double volume);
+  void SetAttack(double sec);
+  void SetRelease(double sec);
 
 private:
   int m_sampleRate;
@@ -18,6 +21,7 @@ private:
   double m_amplitude = 0.2;
   double m_frequency = 440;
   int m_currentNote = -1;
+  double m_volume;
   Envelope m_env;
 };
 

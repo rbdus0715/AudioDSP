@@ -10,12 +10,15 @@ tresult PLUGIN_API SynthController::initialize(FUnknown *context) {
   if (result != kResultOk)
     return result;
 
-  parameters.addParameter(new Vst::RangeParameter(STR16("Volume"), kParamVolume,
-                                                  STR16(""), 0, 1.0, 0.2));
-  parameters.addParameter(new Vst::RangeParameter(STR16("Attack"), kParamAttack,
-                                                  STR16("s"), 1e-9, 1.0, 0.01));
   parameters.addParameter(new Vst::RangeParameter(
-      STR16("Release"), kParamRelease, STR16("s"), 1e-9, 1.0, 0.2));
+      STR16("Volume"), kParamVolume, STR16(""), kVolumeRange.min,
+      kVolumeRange.max, kVolumeRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Attack"), kParamAttack, STR16("s"), kAttackRange.min,
+      kAttackRange.max, kAttackRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Release"), kParamRelease, STR16("s"), kReleaseRange.min,
+      kReleaseRange.max, kReleaseRange.def));
 
   return kResultOk;
 }
