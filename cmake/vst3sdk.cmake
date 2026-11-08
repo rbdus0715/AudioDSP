@@ -13,3 +13,5 @@ FetchContent_Declare(vst3sdk
 FetchContent_MakeAvailable(vst3sdk)
 
 smtg_enable_vst3_sdk()
+
+list(APPEND CMAKE_MODULE_PATH "${vst3sdk_SOURCE_DIR}/cmake/modules")
