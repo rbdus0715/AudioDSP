@@ -1,4 +1,5 @@
 #include "processor.hpp"
+#include "base/source/fstreamer.h"
 #include "cids.h"
 #include "pluginterfaces/vst/ivstevents.h"
 #include <cstring>
@@ -111,7 +112,33 @@ tresult PLUGIN_API SynthProcessor::process(Vst::ProcessData &data) {
   return kResultOk;
 }
 
-tresult PLUGIN_API SynthProcessor::setState(IBStream *) { return kResultOk; }
-tresult PLUGIN_API SynthProcessor::getState(IBStream *) { return kResultOk; }
+tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
+  IBStreamer s(state, kLittleEndian);
+  int32 version = 0;
+  double volume, attack, release;
+  if (!s.readInt32(version) || !s.readDouble(volume) || !s.readDouble(attack) ||
+      !s.readDouble(release))
+    return kResultFalse;
+
+  m_volume = volume;
+  m_attack = attack;
+  m_release = release;
+
+  //
+  if (m_synth) {
+    m_synth->SetVolume(m_volume);
+    m_synth->SetAttack(m_attack);
+    m_synth->SetRelease(m_release);
+  }
+  return kResultOk;
+}
+tresult PLUGIN_API SynthProcessor::getState(IBStream *state) {
+  IBStreamer s(state, kLittleEndian);
+  s.writeInt32(kStateVersion);
+  s.writeDouble(m_volume);
+  s.writeDouble(m_attack);
+  s.writeDouble(m_release);
+  return kResultOk;
+}
 
 } // namespace AudioDSP

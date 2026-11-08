@@ -1,4 +1,5 @@
 #include "controller.hpp"
+#include "base/source/fstreamer.h"
 #include "cids.h"
 
 using namespace Steinberg;
@@ -30,6 +31,17 @@ tresult PLUGIN_API SynthController::terminate() {
 tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
   if (!state)
     return kResultFalse;
+
+  IBStreamer s(state, kLittleEndian);
+  int32 version = 0;
+  double volume, attack, release;
+  if (!s.readInt32(version) || !s.readDouble(volume) || !s.readDouble(attack) ||
+      !s.readDouble(release))
+    return kResultFalse;
+
+  setParamNormalized(kParamVolume, kVolumeRange.ToNormalized(volume));
+  setParamNormalized(kParamAttack, kAttackRange.ToNormalized(attack));
+  setParamNormalized(kParamRelease, kReleaseRange.ToNormalized(release));
   return kResultOk;
 }
 

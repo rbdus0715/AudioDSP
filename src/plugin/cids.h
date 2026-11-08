@@ -18,11 +18,15 @@ enum ParamIDs : Steinberg::Vst::ParamID {
   kParamRelease = 2,
 };
 
+const Steinberg::int32 kStateVersion = 1;
 struct ParamRange {
   double min, max, def;
   double ToPlain(double normalized) const {
     return min + (max - min) * normalized;
   };
+  double ToNormalized(double plain) const {
+    return (plain - min) / (max - min);
+  }
 };
 constexpr ParamRange kVolumeRange{0.0, 1.0, 0.2};
 constexpr ParamRange kAttackRange{1e-9, 1.0, 0.01};
