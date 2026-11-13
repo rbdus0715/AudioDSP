@@ -7,8 +7,8 @@ double NoteToFrequency(int note) {
 }
 
 Synth::Synth(int sampleRate, double phase)
-    : m_sampleRate(sampleRate), m_phase(phase), m_env(sampleRate, 0.01, 0.3),
-      m_volume(0.2) {}
+    : m_sampleRate(sampleRate), m_phase(phase),
+      m_env(sampleRate, 0.01, 0.3, 0.7, 0.3), m_volume(0.2) {}
 
 bool Synth::GenerateSamples(AudioBuffer &buffer, size_t numFrames) {
   Render(buffer, 0, numFrames);
@@ -30,6 +30,8 @@ void Synth::NoteOff(int note) {
 void Synth::SetVolume(double volume) { m_volume = volume; }
 void Synth::SetAttack(double sec) { m_env.SetAttack(sec); }
 void Synth::SetRelease(double sec) { m_env.SetRelease(sec); }
+void Synth::SetDecay(double sec) { m_env.SetDecay(sec); }
+void Synth::SetSustain(double level) { m_env.SetSustain(level); }
 
 void Synth::Render(AudioBuffer &buffer, size_t start, size_t count) {
   if (!m_env.IsActive())
