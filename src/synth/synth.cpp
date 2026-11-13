@@ -11,20 +11,7 @@ Synth::Synth(int sampleRate, double phase)
       m_volume(0.2) {}
 
 bool Synth::GenerateSamples(AudioBuffer &buffer, size_t numFrames) {
-  if (!m_env.IsActive())
-    return true;
-  double phaseIncrement = 2 * PI * m_frequency / m_sampleRate;
-  double sample = 0;
-  for (size_t i = 0; i < numFrames; i++) {
-    sample = m_amplitude * std::sin(m_phase) * m_env.Next();
-    for (int ch = 0; ch < buffer.GetNumChannels(); ch++) {
-      buffer.GetWritePointer(ch)[i] += sample;
-    }
-    m_phase += phaseIncrement;
-    if (m_phase >= 2 * PI)
-      m_phase -= 2 * PI;
-  }
-
+  Render(buffer, 0, numFrames);
   return true;
 }
 
@@ -43,3 +30,19 @@ void Synth::NoteOff(int note) {
 void Synth::SetVolume(double volume) { m_volume = volume; }
 void Synth::SetAttack(double sec) { m_env.SetAttack(sec); }
 void Synth::SetRelease(double sec) { m_env.SetRelease(sec); }
+
+void Synth::Render(AudioBuffer &buffer, size_t start, size_t count) {
+  if (!m_env.IsActive())
+    return;
+  double phaseIncrement = 2 * PI * m_frequency / m_sampleRate;
+  double sample = 0;
+  for (size_t i = start; i < start + count; i++) {
+    sample = m_amplitude * std::sin(m_phase) * m_env.Next();
+    for (int ch = 0; ch < buffer.GetNumChannels(); ch++) {
+      buffer.GetWritePointer(ch)[i] += sample;
+    }
+    m_phase += phaseIncrement;
+    if (m_phase >= 2 * PI)
+      m_phase -= 2 * PI;
+  }
+}

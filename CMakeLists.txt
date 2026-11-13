@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
 
-# macOS 최소 지원 버전. project() 전에 정해야 한다.
 set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version")
 
 project(AudioDSP VERSION 0.1.0 LANGUAGES CXX C)

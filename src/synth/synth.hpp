@@ -14,6 +14,7 @@ public:
   void SetVolume(double volume);
   void SetAttack(double sec);
   void SetRelease(double sec);
+  void Render(AudioBuffer &buffer, size_t start, size_t count);
 
 private:
   int m_sampleRate;

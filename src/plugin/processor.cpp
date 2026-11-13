@@ -2,6 +2,7 @@
 #include "base/source/fstreamer.h"
 #include "cids.h"
 #include "pluginterfaces/vst/ivstevents.h"
+#include <algorithm>
 #include <cstring>
 
 using namespace Steinberg;
@@ -74,34 +75,33 @@ tresult PLUGIN_API SynthProcessor::process(Vst::ProcessData &data) {
     }
   }
 
-  // 이벤트: DAW가 보낸 노트를 Synth에 전달
-  if (data.inputEvents) {
-    int32 count = data.inputEvents->getEventCount();
-    for (int32 i = 0; i < count; i++) {
-      Vst::Event e;
-      if (data.inputEvents->getEvent(i, e) != kResultOk)
-        continue;
-
-      switch (e.type) {
-      case Vst::Event::kNoteOnEvent:
-        m_synth->NoteOn(e.noteOn.pitch, e.noteOn.velocity);
-        break;
-      case Vst::Event::kNoteOffEvent:
-        m_synth->NoteOff(e.noteOff.pitch);
-        break;
-      }
-    }
-  }
-
-  // 출력할 곳이 없으면 여기서 끝
-  if (data.numSamples == 0 || data.numOutputs == 0)
-    return kResultOk;
-
   // 버퍼에 렌더링
   m_buffer.Clear();
-  m_synth->GenerateSamples(m_buffer, data.numSamples);
+  int32 rendered = 0;
+  int32 numEvents = data.inputEvents ? data.inputEvents->getEventCount() : 0;
+
+  for (int32 i = 0; i < numEvents; i++) {
+    Vst::Event e;
+    if (data.inputEvents->getEvent(i, e) != kResultOk)
+      continue;
+    int32 offset = std::clamp(e.sampleOffset, rendered, data.numSamples);
+    m_synth->Render(m_buffer, rendered, offset - rendered);
+    rendered = offset;
+
+    switch (e.type) {
+    case Vst::Event::kNoteOnEvent:
+      m_synth->NoteOn(e.noteOn.pitch, e.noteOn.velocity);
+      break;
+    case Vst::Event::kNoteOffEvent:
+      m_synth->NoteOff(e.noteOff.pitch);
+      break;
+    }
+  }
+  m_synth->Render(m_buffer, rendered, data.numSamples - rendered);
 
   // 버퍼 -> DAW 버퍼로 복사
+  if (data.numOutputs == 0)
+    return kResultOk;
   Vst::AudioBusBuffers &out = data.outputs[0];
   for (int32 ch = 0; ch < out.numChannels; ch++) {
     std::memcpy(out.channelBuffers32[ch], m_buffer.GetReadPointer(ch),
