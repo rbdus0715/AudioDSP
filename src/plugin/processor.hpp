@@ -47,6 +47,7 @@ private:
   double m_release = kReleaseRange.def;
   double m_decay = kDecayRange.def;
   double m_sustain = kSustainRange.def;
+  Steinberg::int32 m_waveform = kWaveformDefault; // 0~3, Synth::Waveform 순서
 };
 
 } // namespace AudioDSP

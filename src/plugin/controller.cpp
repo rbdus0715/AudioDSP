@@ -27,6 +27,18 @@ tresult PLUGIN_API SynthController::initialize(FUnknown *context) {
       STR16("Sustain"), kParamSustain, STR16(""), kSustainRange.min,
       kSustainRange.max, kSustainRange.def));
 
+  // StringListParameter: stepCount 와 정규화 변환을 알아서 해주고,
+  // DAW 에 "Saw" 같은 이름을 보여줌
+  auto *wave = new Vst::StringListParameter(STR16("Waveform"), kParamWaveform);
+  wave->appendString(STR16("Sine"));
+  wave->appendString(STR16("Saw"));
+  wave->appendString(STR16("Square"));
+  wave->appendString(STR16("Triangle"));
+  wave->getInfo().defaultNormalizedValue =
+      WaveformToNormalized(kWaveformDefault);
+  wave->setNormalized(WaveformToNormalized(kWaveformDefault));
+  parameters.addParameter(wave);
+
   return kResultOk;
 }
 
@@ -50,12 +62,18 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
     if (!s.readDouble(decay) || !s.readDouble(sustain))
       return kResultFalse;
   }
+  int32 waveform = kWaveformDefault;
+  if (version >= 3) {
+    if (!s.readInt32(waveform))
+      return kResultFalse;
+  }
 
   setParamNormalized(kParamVolume, kVolumeRange.ToNormalized(volume));
   setParamNormalized(kParamAttack, kAttackRange.ToNormalized(attack));
   setParamNormalized(kParamRelease, kReleaseRange.ToNormalized(release));
   setParamNormalized(kParamDecay, kDecayRange.ToNormalized(decay));
   setParamNormalized(kParamSustain, kSustainRange.ToNormalized(sustain));
+  setParamNormalized(kParamWaveform, WaveformToNormalized(waveform));
 
   return kResultOk;
 }

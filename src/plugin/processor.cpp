@@ -34,6 +34,7 @@ tresult PLUGIN_API SynthProcessor::setupProcessing(Vst::ProcessSetup &setup) {
   m_synth->SetRelease(m_release);
   m_synth->SetDecay(m_decay);
   m_synth->SetSustain(m_sustain);
+  m_synth->SetWaveform(static_cast<Synth::Waveform>(m_waveform));
   m_buffer.SetSize(2, setup.maxSamplesPerBlock);
 
   return AudioEffect::setupProcessing(setup);
@@ -79,6 +80,10 @@ tresult PLUGIN_API SynthProcessor::process(Vst::ProcessData &data) {
       case kParamRelease:
         m_release = kReleaseRange.ToPlain(value);
         m_synth->SetRelease(m_release);
+        break;
+      case kParamWaveform:
+        m_waveform = WaveformFromNormalized(value);
+        m_synth->SetWaveform(static_cast<Synth::Waveform>(m_waveform));
         break;
       }
     }
@@ -135,18 +140,24 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
     if (!s.readDouble(decay) || !s.readDouble(sustain))
       return kResultFalse;
   }
+  int32 waveform = kWaveformDefault;
+  if (version >= 3) {
+    if (!s.readInt32(waveform))
+      return kResultFalse;
+  }
   m_volume = volume;
   m_attack = attack;
   m_release = release;
   m_decay = decay;
   m_sustain = sustain;
-  //
+  m_waveform = ClampWaveform(waveform);
   if (m_synth) {
     m_synth->SetVolume(m_volume);
     m_synth->SetAttack(m_attack);
     m_synth->SetRelease(m_release);
     m_synth->SetDecay(m_decay);
     m_synth->SetSustain(m_sustain);
+    m_synth->SetWaveform(static_cast<Synth::Waveform>(m_waveform));
   }
   return kResultOk;
 }
@@ -158,6 +169,7 @@ tresult PLUGIN_API SynthProcessor::getState(IBStream *state) {
   s.writeDouble(m_release);
   s.writeDouble(m_decay);
   s.writeDouble(m_sustain);
+  s.writeInt32(m_waveform);
   return kResultOk;
 }
 
