@@ -16,9 +16,12 @@ enum ParamIDs : Steinberg::Vst::ParamID {
   kParamVolume = 0,
   kParamAttack = 1,
   kParamRelease = 2,
+  kParamDecay = 3,
+  kParamSustain = 4,
 };
 
-const Steinberg::int32 kStateVersion = 1;
+const Steinberg::int32 kStateVersion = 2;
+// const Steinberg::int32 kStateVersion = 1;
 struct ParamRange {
   double min, max, def;
   double ToPlain(double normalized) const {
@@ -31,4 +34,6 @@ struct ParamRange {
 constexpr ParamRange kVolumeRange{0.0, 1.0, 0.2};
 constexpr ParamRange kAttackRange{1e-9, 1.0, 0.01};
 constexpr ParamRange kReleaseRange{1e-9, 1.0, 0.3};
+constexpr ParamRange kDecayRange{0.001, 1.0, 0.3};
+constexpr ParamRange kSustainRange{0.0, 1.0, 0.7};
 } // namespace AudioDSP

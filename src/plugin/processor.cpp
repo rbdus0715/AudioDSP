@@ -32,6 +32,8 @@ tresult PLUGIN_API SynthProcessor::setupProcessing(Vst::ProcessSetup &setup) {
   m_synth->SetVolume(m_volume);
   m_synth->SetAttack(m_attack);
   m_synth->SetRelease(m_release);
+  m_synth->SetDecay(m_decay);
+  m_synth->SetSustain(m_sustain);
   m_buffer.SetSize(2, setup.maxSamplesPerBlock);
 
   return AudioEffect::setupProcessing(setup);
@@ -66,7 +68,14 @@ tresult PLUGIN_API SynthProcessor::process(Vst::ProcessData &data) {
         m_attack = kAttackRange.ToPlain(value);
         m_synth->SetAttack(m_attack);
         break;
-
+      case kParamDecay:
+        m_decay = kDecayRange.ToPlain(value);
+        m_synth->SetDecay(m_decay);
+        break;
+      case kParamSustain:
+        m_sustain = kSustainRange.ToPlain(value);
+        m_synth->SetSustain(m_sustain);
+        break;
       case kParamRelease:
         m_release = kReleaseRange.ToPlain(value);
         m_synth->SetRelease(m_release);
@@ -120,15 +129,24 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
       !s.readDouble(release))
     return kResultFalse;
 
+  double decay = kDecayRange.def;
+  double sustain = kSustainRange.def;
+  if (version >= 2) {
+    if (!s.readDouble(decay) || !s.readDouble(sustain))
+      return kResultFalse;
+  }
   m_volume = volume;
   m_attack = attack;
   m_release = release;
-
+  m_decay = decay;
+  m_sustain = sustain;
   //
   if (m_synth) {
     m_synth->SetVolume(m_volume);
     m_synth->SetAttack(m_attack);
     m_synth->SetRelease(m_release);
+    m_synth->SetDecay(m_decay);
+    m_synth->SetSustain(m_sustain);
   }
   return kResultOk;
 }
@@ -138,6 +156,8 @@ tresult PLUGIN_API SynthProcessor::getState(IBStream *state) {
   s.writeDouble(m_volume);
   s.writeDouble(m_attack);
   s.writeDouble(m_release);
+  s.writeDouble(m_decay);
+  s.writeDouble(m_sustain);
   return kResultOk;
 }
 

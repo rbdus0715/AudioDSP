@@ -20,6 +20,12 @@ tresult PLUGIN_API SynthController::initialize(FUnknown *context) {
   parameters.addParameter(new Vst::RangeParameter(
       STR16("Release"), kParamRelease, STR16("s"), kReleaseRange.min,
       kReleaseRange.max, kReleaseRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Decay"), kParamDecay, STR16("s"), kDecayRange.min, kDecayRange.max,
+      kDecayRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Sustain"), kParamSustain, STR16(""), kSustainRange.min,
+      kSustainRange.max, kSustainRange.def));
 
   return kResultOk;
 }
@@ -38,10 +44,22 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
   if (!s.readInt32(version) || !s.readDouble(volume) || !s.readDouble(attack) ||
       !s.readDouble(release))
     return kResultFalse;
+  double decay = kDecayRange.def;
+  double sustain = kSustainRange.def;
+  if (version >= 2) {
+    if (!s.readDouble(decay) || !s.readDouble(sustain))
+      return kResultFalse;
+  }
+  if (!s.readInt32(version) || !s.readDouble(volume) || !s.readDouble(attack) ||
+      !s.readDouble(release))
+    return kResultFalse;
 
   setParamNormalized(kParamVolume, kVolumeRange.ToNormalized(volume));
   setParamNormalized(kParamAttack, kAttackRange.ToNormalized(attack));
   setParamNormalized(kParamRelease, kReleaseRange.ToNormalized(release));
+  setParamNormalized(kParamDecay, kDecayRange.ToNormalized(decay));
+  setParamNormalized(kParamSustain, kSustainRange.ToNormalized(sustain));
+
   return kResultOk;
 }
 

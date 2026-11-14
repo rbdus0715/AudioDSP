@@ -45,6 +45,8 @@ private:
   double m_volume = kVolumeRange.def;
   double m_attack = kAttackRange.def;
   double m_release = kReleaseRange.def;
+  double m_decay = kDecayRange.def;
+  double m_sustain = kSustainRange.def;
 };
 
 } // namespace AudioDSP
