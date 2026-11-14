@@ -4,6 +4,12 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version")
 
 project(AudioDSP VERSION 0.1.0 LANGUAGES CXX C)
 
+# VSTGUI / AU 래퍼에 Objective-C++(.mm) 파일이 있음. Xcode 는 알아서 처리하지만
+# Makefile/Ninja 제너레이터는 언어를 켜 줘야 함
+if(APPLE)
+    enable_language(OBJC OBJCXX)
+endif()
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 17)

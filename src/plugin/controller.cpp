@@ -2,6 +2,7 @@
 #include "base/source/fstreamer.h"
 #include "cids.h"
 #include "pluginterfaces/base/ustring.h"
+#include "vstgui/plugin-bindings/vst3editor.h"
 #include <string>
 
 using namespace Steinberg;
@@ -213,6 +214,12 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
   }
 
   return kResultOk;
+}
+
+IPlugView *PLUGIN_API SynthController::createView(FIDString name) {
+  if (FIDStringsEqual(name, Vst::ViewType::kEditor))
+    return new VSTGUI::VST3Editor(this, "view", "editor.uidesc");
+  return nullptr;
 }
 
 } // namespace AudioDSP

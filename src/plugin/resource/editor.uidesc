@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vstgui-ui-description version="1">
+	<template background-color="~ BlackCColor" background-color-draw-style="filled" class="CViewContainer" name="view" origin="0, 0" size="730, 506" transparent="false">
+		<view class="CTextLabel" origin="10, 34" size="340, 20" title="OSC" font="~ NormalFontBig" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CTextLabel" origin="10, 58" size="110, 20" title="Wave" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="COptionMenu" control-tag="Waveform" origin="120, 58" size="150, 20" font-color="~ WhiteCColor" back-color="~ BlackCColor" frame-color="~ GreyCColor" text-alignment="left"/>
+		<view class="CTextLabel" origin="10, 88" size="340, 20" title="AMP EG" font="~ NormalFontBig" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CTextLabel" origin="10, 112" size="110, 20" title="Attack" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Attack" origin="120, 115" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Attack" origin="276, 112" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 134" size="110, 20" title="Decay" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Decay" origin="120, 137" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Decay" origin="276, 134" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 156" size="110, 20" title="Sustain" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Sustain" origin="120, 159" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Sustain" origin="276, 156" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 178" size="110, 20" title="Release" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Release" origin="120, 181" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Release" origin="276, 178" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 208" size="340, 20" title="FILTER" font="~ NormalFontBig" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CTextLabel" origin="10, 232" size="110, 20" title="Cutoff" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Cutoff" origin="120, 235" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Cutoff" origin="276, 232" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 254" size="110, 20" title="Resonance" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Resonance" origin="120, 257" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Resonance" origin="276, 254" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 276" size="110, 20" title="LP / BP / HP" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="FilterBlend" origin="120, 279" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="FilterBlend" origin="276, 276" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 298" size="110, 20" title="Drive" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="FilterDrive" origin="120, 301" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="FilterDrive" origin="276, 298" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 320" size="110, 20" title="Keytrack" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Keytrack" origin="120, 323" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-value-from-center="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Keytrack" origin="276, 320" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 350" size="340, 20" title="FILTER EG" font="~ NormalFontBig" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CTextLabel" origin="10, 374" size="110, 20" title="Attack" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="FilterAttack" origin="120, 377" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="FilterAttack" origin="276, 374" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 396" size="110, 20" title="Decay" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="FilterDecay" origin="120, 399" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="FilterDecay" origin="276, 396" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 418" size="110, 20" title="Sustain" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="FilterSustain" origin="120, 421" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="FilterSustain" origin="276, 418" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 440" size="110, 20" title="Release" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="FilterRelease" origin="120, 443" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="FilterRelease" origin="276, 440" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="10, 462" size="110, 20" title="Amount" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="FilterEnvAmount" origin="120, 465" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-value-from-center="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="FilterEnvAmount" origin="276, 462" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="380, 34" size="340, 20" title="MASTER" font="~ NormalFontBig" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CTextLabel" origin="380, 58" size="110, 20" title="Volume" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Volume" origin="490, 61" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Volume" origin="646, 58" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="380, 88" size="340, 20" title="LFO" font="~ NormalFontBig" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CTextLabel" origin="380, 112" size="110, 20" title="Shape" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="COptionMenu" control-tag="LfoShape" origin="490, 112" size="150, 20" font-color="~ WhiteCColor" back-color="~ BlackCColor" frame-color="~ GreyCColor" text-alignment="left"/>
+		<view class="CTextLabel" origin="380, 134" size="110, 20" title="Rate" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="LfoRate" origin="490, 137" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="LfoRate" origin="646, 134" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="380, 156" size="110, 20" title="> Cutoff" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="LfoToCutoff" origin="490, 159" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-value-from-center="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="LfoToCutoff" origin="646, 156" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="380, 178" size="110, 20" title="> Pitch" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="LfoToPitch" origin="490, 181" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-value-from-center="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="LfoToPitch" origin="646, 178" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="380, 208" size="340, 20" title="MOD MATRIX" font="~ NormalFontBig" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CTextLabel" origin="380, 232" size="110, 20" title="1 Source" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="COptionMenu" control-tag="Mod1Source" origin="490, 232" size="150, 20" font-color="~ WhiteCColor" back-color="~ BlackCColor" frame-color="~ GreyCColor" text-alignment="left"/>
+		<view class="CTextLabel" origin="380, 254" size="110, 20" title="1 Target" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="COptionMenu" control-tag="Mod1Dest" origin="490, 254" size="150, 20" font-color="~ WhiteCColor" back-color="~ BlackCColor" frame-color="~ GreyCColor" text-alignment="left"/>
+		<view class="CTextLabel" origin="380, 276" size="110, 20" title="1 Amount" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Mod1Amount" origin="490, 279" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-value-from-center="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Mod1Amount" origin="646, 276" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="380, 298" size="110, 20" title="2 Source" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="COptionMenu" control-tag="Mod2Source" origin="490, 298" size="150, 20" font-color="~ WhiteCColor" back-color="~ BlackCColor" frame-color="~ GreyCColor" text-alignment="left"/>
+		<view class="CTextLabel" origin="380, 320" size="110, 20" title="2 Target" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="COptionMenu" control-tag="Mod2Dest" origin="490, 320" size="150, 20" font-color="~ WhiteCColor" back-color="~ BlackCColor" frame-color="~ GreyCColor" text-alignment="left"/>
+		<view class="CTextLabel" origin="380, 342" size="110, 20" title="2 Amount" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Mod2Amount" origin="490, 345" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-value-from-center="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Mod2Amount" origin="646, 342" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="380, 364" size="110, 20" title="3 Source" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="COptionMenu" control-tag="Mod3Source" origin="490, 364" size="150, 20" font-color="~ WhiteCColor" back-color="~ BlackCColor" frame-color="~ GreyCColor" text-alignment="left"/>
+		<view class="CTextLabel" origin="380, 386" size="110, 20" title="3 Target" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="COptionMenu" control-tag="Mod3Dest" origin="490, 386" size="150, 20" font-color="~ WhiteCColor" back-color="~ BlackCColor" frame-color="~ GreyCColor" text-alignment="left"/>
+		<view class="CTextLabel" origin="380, 408" size="110, 20" title="3 Amount" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Mod3Amount" origin="490, 411" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-value-from-center="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Mod3Amount" origin="646, 408" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+		<view class="CTextLabel" origin="380, 430" size="110, 20" title="4 Source" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="COptionMenu" control-tag="Mod4Source" origin="490, 430" size="150, 20" font-color="~ WhiteCColor" back-color="~ BlackCColor" frame-color="~ GreyCColor" text-alignment="left"/>
+		<view class="CTextLabel" origin="380, 452" size="110, 20" title="4 Target" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="COptionMenu" control-tag="Mod4Dest" origin="490, 452" size="150, 20" font-color="~ WhiteCColor" back-color="~ BlackCColor" frame-color="~ GreyCColor" text-alignment="left"/>
+		<view class="CTextLabel" origin="380, 474" size="110, 20" title="4 Amount" font-color="~ WhiteCColor" text-alignment="left" transparent="true"/>
+		<view class="CSlider" control-tag="Mod4Amount" origin="490, 477" size="150, 14" orientation="horizontal" draw-frame="true" draw-back="true" draw-value="true" draw-value-from-center="true" draw-frame-color="~ GreyCColor" draw-back-color="~ GreyCColor" draw-value-color="~ GreenCColor" transparent="false"/>
+		<view class="CParamDisplay" control-tag="Mod4Amount" origin="646, 474" size="74, 20" font-color="~ WhiteCColor" text-alignment="right" transparent="true"/>
+	</template>
+	<control-tags>
+		<control-tag name="Volume" tag="0"/>
+		<control-tag name="Attack" tag="1"/>
+		<control-tag name="Release" tag="2"/>
+		<control-tag name="Decay" tag="3"/>
+		<control-tag name="Sustain" tag="4"/>
+		<control-tag name="Waveform" tag="5"/>
+		<control-tag name="Cutoff" tag="6"/>
+		<control-tag name="Resonance" tag="7"/>
+		<control-tag name="FilterBlend" tag="8"/>
+		<control-tag name="FilterAttack" tag="9"/>
+		<control-tag name="FilterDecay" tag="10"/>
+		<control-tag name="FilterSustain" tag="11"/>
+		<control-tag name="FilterRelease" tag="12"/>
+		<control-tag name="FilterEnvAmount" tag="13"/>
+		<control-tag name="Keytrack" tag="14"/>
+		<control-tag name="FilterDrive" tag="15"/>
+		<control-tag name="LfoRate" tag="16"/>
+		<control-tag name="LfoShape" tag="17"/>
+		<control-tag name="LfoToCutoff" tag="18"/>
+		<control-tag name="LfoToPitch" tag="19"/>
+		<control-tag name="Mod1Source" tag="20"/>
+		<control-tag name="Mod1Dest" tag="21"/>
+		<control-tag name="Mod1Amount" tag="22"/>
+		<control-tag name="Mod2Source" tag="23"/>
+		<control-tag name="Mod2Dest" tag="24"/>
+		<control-tag name="Mod2Amount" tag="25"/>
+		<control-tag name="Mod3Source" tag="26"/>
+		<control-tag name="Mod3Dest" tag="27"/>
+		<control-tag name="Mod3Amount" tag="28"/>
+		<control-tag name="Mod4Source" tag="29"/>
+		<control-tag name="Mod4Dest" tag="30"/>
+		<control-tag name="Mod4Amount" tag="31"/>
+	</control-tags>
+	<custom>
+		<attributes Path="/Users/gyuyeonjo/Development/AudioDSP/src/plugin/resource/editor.uidesc" name="VST3Editor"/>
+	</custom>
+</vstgui-ui-description>

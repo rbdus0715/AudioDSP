@@ -19,6 +19,8 @@ public:
 
   Steinberg::tresult PLUGIN_API setComponentState(Steinberg::IBStream *state)
       SMTG_OVERRIDE;
+  Steinberg::IPlugView *PLUGIN_API createView(Steinberg::FIDString name)
+      SMTG_OVERRIDE;
 };
 } // namespace AudioDSP
 #endif
