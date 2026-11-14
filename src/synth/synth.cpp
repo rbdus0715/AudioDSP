@@ -128,3 +128,19 @@ void Synth::SetFilterDrive(double value) {
   for (Voice &v : m_voices)
     v.SetFilterDrive(value);
 }
+void Synth::SetLfoRate(double value) {
+  for (Voice &v : m_voices)
+    v.SetLfoRate(value);
+}
+void Synth::SetLfoShape(Lfo::Shape value) {
+  for (Voice &v : m_voices)
+    v.SetLfoShape(value);
+}
+void Synth::SetLfoToCutoff(double value) {
+  for (Voice &v : m_voices)
+    v.SetLfoToCutoff(value);
+}
+void Synth::SetLfoToPitch(double value) {
+  for (Voice &v : m_voices)
+    v.SetLfoToPitch(value);
+}

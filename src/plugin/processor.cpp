@@ -3,6 +3,7 @@
 #include "cids.h"
 #include "pluginterfaces/vst/ivstevents.h"
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 
 using namespace Steinberg;
@@ -45,6 +46,10 @@ tresult PLUGIN_API SynthProcessor::setupProcessing(Vst::ProcessSetup &setup) {
   m_synth->SetFilterEnvAmount(m_filterEnvAmount);
   m_synth->SetKeytrack(m_keytrack);
   m_synth->SetFilterDrive(m_filterDrive);
+  m_synth->SetLfoRate(std::pow(2.0, m_lfoRate));
+  m_synth->SetLfoShape(static_cast<Lfo::Shape>(m_lfoShape));
+  m_synth->SetLfoToCutoff(m_lfoToCutoff);
+  m_synth->SetLfoToPitch(m_lfoToPitch);
   m_synth->SnapParameters();
   m_buffer.SetSize(2, setup.maxSamplesPerBlock);
 
@@ -135,6 +140,22 @@ tresult PLUGIN_API SynthProcessor::process(Vst::ProcessData &data) {
       case kParamFilterDrive:
         m_filterDrive = kFilterDriveRange.ToPlain(value);
         m_synth->SetFilterDrive(m_filterDrive);
+        break;
+      case kParamLfoRate:
+        m_lfoRate = kLfoRateRange.ToPlain(value);
+        m_synth->SetLfoRate(std::pow(2.0, m_lfoRate));
+        break;
+      case kParamLfoShape:
+        m_lfoShape = LfoShapeFromNormalized(value);
+        m_synth->SetLfoShape(static_cast<Lfo::Shape>(m_lfoShape));
+        break;
+      case kParamLfoToCutoff:
+        m_lfoToCutoff = kLfoToCutoffRange.ToPlain(value);
+        m_synth->SetLfoToCutoff(m_lfoToCutoff);
+        break;
+      case kParamLfoToPitch:
+        m_lfoToPitch = kLfoToPitchRange.ToPlain(value);
+        m_synth->SetLfoToPitch(m_lfoToPitch);
         break;
       }
     }
@@ -227,6 +248,15 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
     if (!s.readDouble(drive))
       return kResultFalse;
   }
+  double lfoRate = kLfoRateRange.def;
+  int32 lfoShape = kLfoShapeDefault;
+  double lfoToCutoff = kLfoToCutoffRange.def;
+  double lfoToPitch = kLfoToPitchRange.def;
+  if (version >= 8) {
+    if (!s.readDouble(lfoRate) || !s.readInt32(lfoShape) ||
+        !s.readDouble(lfoToCutoff) || !s.readDouble(lfoToPitch))
+      return kResultFalse;
+  }
   m_volume = volume;
   m_attack = attack;
   m_release = release;
@@ -243,6 +273,10 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
   m_filterEnvAmount = filterEnvAmount;
   m_keytrack = keytrack;
   m_filterDrive = drive;
+  m_lfoRate = lfoRate;
+  m_lfoShape = ClampLfoShape(lfoShape);
+  m_lfoToCutoff = lfoToCutoff;
+  m_lfoToPitch = lfoToPitch;
   if (m_synth) {
     m_synth->SetVolume(m_volume);
     m_synth->SetAttack(m_attack);
@@ -260,6 +294,10 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
     m_synth->SetFilterEnvAmount(m_filterEnvAmount);
     m_synth->SetKeytrack(m_keytrack);
     m_synth->SetFilterDrive(m_filterDrive);
+    m_synth->SetLfoRate(std::pow(2.0, m_lfoRate));
+    m_synth->SetLfoShape(static_cast<Lfo::Shape>(m_lfoShape));
+    m_synth->SetLfoToCutoff(m_lfoToCutoff);
+    m_synth->SetLfoToPitch(m_lfoToPitch);
   }
   return kResultOk;
 }
@@ -282,6 +320,10 @@ tresult PLUGIN_API SynthProcessor::getState(IBStream *state) {
   s.writeDouble(m_filterEnvAmount);
   s.writeDouble(m_keytrack);
   s.writeDouble(m_filterDrive);
+  s.writeDouble(m_lfoRate);
+  s.writeInt32(m_lfoShape);
+  s.writeDouble(m_lfoToCutoff);
+  s.writeDouble(m_lfoToPitch);
   return kResultOk;
 }
 

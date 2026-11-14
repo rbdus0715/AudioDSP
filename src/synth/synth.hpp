@@ -38,6 +38,10 @@ public:
   void SetFilterDecay(double sec);
   void SetFilterSustain(double level);
   void SetFilterRelease(double sec);
+  void SetLfoRate(double hz);
+  void SetLfoShape(Lfo::Shape shape);
+  void SetLfoToCutoff(double semitones);
+  void SetLfoToPitch(double semitones);
 
 private:
   Voice &GrabVoice();

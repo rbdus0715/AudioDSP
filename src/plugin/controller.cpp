@@ -70,6 +70,22 @@ tresult PLUGIN_API SynthController::initialize(FUnknown *context) {
       STR16("Filter Drive"), kParamFilterDrive, STR16("dB"),
       kFilterDriveRange.min, kFilterDriveRange.max, kFilterDriveRange.def));
 
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("LFO Rate"), kParamLfoRate, STR16("2^x Hz"), kLfoRateRange.min,
+      kLfoRateRange.max, kLfoRateRange.def));
+  auto *lfoShape = new Vst::StringListParameter(STR16("LFO Shape"), kParamLfoShape);
+  lfoShape->appendString(STR16("Sine"));
+  lfoShape->appendString(STR16("Triangle"));
+  lfoShape->appendString(STR16("Saw"));
+  lfoShape->appendString(STR16("Square"));
+  parameters.addParameter(lfoShape);
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("LFO > Cutoff"), kParamLfoToCutoff, STR16("st"),
+      kLfoToCutoffRange.min, kLfoToCutoffRange.max, kLfoToCutoffRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("LFO > Pitch"), kParamLfoToPitch, STR16("st"), kLfoToPitchRange.min,
+      kLfoToPitchRange.max, kLfoToPitchRange.def));
+
   return kResultOk;
 }
 
@@ -129,6 +145,15 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
     if (!s.readDouble(drive))
       return kResultFalse;
   }
+  double lfoRate = kLfoRateRange.def;
+  int32 lfoShape = kLfoShapeDefault;
+  double lfoToCutoff = kLfoToCutoffRange.def;
+  double lfoToPitch = kLfoToPitchRange.def;
+  if (version >= 8) {
+    if (!s.readDouble(lfoRate) || !s.readInt32(lfoShape) ||
+        !s.readDouble(lfoToCutoff) || !s.readDouble(lfoToPitch))
+      return kResultFalse;
+  }
 
   setParamNormalized(kParamVolume, kVolumeRange.ToNormalized(volume));
   setParamNormalized(kParamAttack, kAttackRange.ToNormalized(attack));
@@ -146,6 +171,10 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
   setParamNormalized(kParamFilterEnvAmount, kFilterEnvAmountRange.ToNormalized(filterEnvAmount));
   setParamNormalized(kParamKeytrack, kKeytrackRange.ToNormalized(keytrack));
   setParamNormalized(kParamFilterDrive, kFilterDriveRange.ToNormalized(drive));
+  setParamNormalized(kParamLfoRate, kLfoRateRange.ToNormalized(lfoRate));
+  setParamNormalized(kParamLfoShape, LfoShapeToNormalized(lfoShape));
+  setParamNormalized(kParamLfoToCutoff, kLfoToCutoffRange.ToNormalized(lfoToCutoff));
+  setParamNormalized(kParamLfoToPitch, kLfoToPitchRange.ToNormalized(lfoToPitch));
 
   return kResultOk;
 }

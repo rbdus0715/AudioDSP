@@ -4,6 +4,7 @@
 #include "../audiobuffer.hpp"
 #include "./envelope.hpp"
 #include "./filter.hpp"
+#include "./lfo.hpp"
 #include "./smoothed_value.hpp"
 #include <cstddef>
 #include <cstdint>
@@ -43,6 +44,10 @@ public:
   void SetFilterDecay(double sec) { m_filterEnv.SetDecay(sec); }
   void SetFilterSustain(double level) { m_filterEnv.SetSustain(level); }
   void SetFilterRelease(double sec) { m_filterEnv.SetRelease(sec); }
+  void SetLfoRate(double hz) { m_lfo.SetRate(hz); }
+  void SetLfoShape(Lfo::Shape s) { m_lfo.SetShape(s); }
+  void SetLfoToCutoff(double semitones) { m_lfoToCutoff.Set(semitones); }
+  void SetLfoToPitch(double semitones) { m_lfoToPitch.Set(semitones); }
   void Render(AudioBuffer &buffer, size_t start, size_t count, double volume);
 
 private:
@@ -59,8 +64,10 @@ private:
   SmoothedValue m_keytrack;
   SmoothedValue m_blend;
   SmoothedValue m_drive;
+  Lfo m_lfo;
+  SmoothedValue m_lfoToCutoff;
+  SmoothedValue m_lfoToPitch;
   double m_phase = 0.0; // 0~1 (2PI x)
-  double m_frequency = 440.0;
   float m_velocity = 0.0f;
   int m_note = -1;
   bool m_held = false;

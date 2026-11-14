@@ -30,6 +30,10 @@ enum ParamIDs : Steinberg::Vst::ParamID {
   kParamFilterEnvAmount = 13,
   kParamKeytrack = 14,
   kParamFilterDrive = 15,
+  kParamLfoRate = 16,
+  kParamLfoShape = 17,
+  kParamLfoToCutoff = 18,
+  kParamLfoToPitch = 19,
 };
 
 // v1: volume, attack, release
@@ -39,7 +43,8 @@ enum ParamIDs : Steinberg::Vst::ParamID {
 // v5: + filter blend
 // v6: + filter env (a, d, s, r, amount), keytrack
 // v7: + filter drive
-const Steinberg::int32 kStateVersion = 7;
+// v8: + lfo rate, lfo shape (int32), lfo -> cutoff, lfo -> pitch
+const Steinberg::int32 kStateVersion = 8;
 struct ParamRange {
   double min, max, def;
   double ToPlain(double normalized) const {
@@ -64,6 +69,22 @@ constexpr ParamRange kFilterReleaseRange{1e-9, 1.0, 0.3};
 constexpr ParamRange kFilterEnvAmountRange{-48.0, 48.0, 0.0};
 constexpr ParamRange kKeytrackRange{-1.0, 1.0, 0.0};
 constexpr ParamRange kFilterDriveRange{0.0, 20.0, 0.0};
+// LFO rate 는 지수: Hz = 2^x (Vital 과 같은 방식). -3~4 -> 0.125Hz~16Hz, 기본 2Hz
+constexpr ParamRange kLfoRateRange{-3.0, 4.0, 1.0};
+constexpr ParamRange kLfoToCutoffRange{-48.0, 48.0, 0.0};
+constexpr ParamRange kLfoToPitchRange{-12.0, 12.0, 0.0};
+
+constexpr Steinberg::int32 kLfoShapeCount = 4; // Sine, Triangle, Saw, Square
+constexpr Steinberg::int32 kLfoShapeDefault = 0;
+inline Steinberg::int32 ClampLfoShape(Steinberg::int32 index) {
+  return std::clamp(index, Steinberg::int32(0), kLfoShapeCount - 1);
+}
+inline Steinberg::int32 LfoShapeFromNormalized(double normalized) {
+  return ClampLfoShape(static_cast<Steinberg::int32>(normalized * kLfoShapeCount));
+}
+inline double LfoShapeToNormalized(Steinberg::int32 index) {
+  return ClampLfoShape(index) / static_cast<double>(kLfoShapeCount - 1);
+}
 
 // 파형 선택 (이산 파라미터). 순서는 Synth::Waveform 과 같아야 함
 constexpr Steinberg::int32 kWaveformCount = 4; // Sine, Saw, Square, Triangle

@@ -27,7 +27,8 @@ Voice::Voice(int sampleRate)
       m_filterEnv(sampleRate, 0.01, 0.3, 0.0, 0.3), m_cutoff(sampleRate, 136.0),
       m_resonance(sampleRate, 0.0), m_filterEnvAmount(sampleRate, 0.0),
       m_keytrack(sampleRate, 0.0), m_blend(sampleRate, 0.0),
-      m_drive(sampleRate, 0.0) {}
+      m_drive(sampleRate, 0.0), m_lfo(sampleRate),
+      m_lfoToCutoff(sampleRate, 0.0), m_lfoToPitch(sampleRate, 0.0) {}
 
 void Voice::SnapParameters() {
   m_cutoff.Snap();
@@ -36,6 +37,8 @@ void Voice::SnapParameters() {
   m_keytrack.Snap();
   m_blend.Snap();
   m_drive.Snap();
+  m_lfoToCutoff.Snap();
+  m_lfoToPitch.Snap();
 }
 
 void Voice::NoteOn(int note, float velocity, uint64_t age) {
@@ -46,7 +49,7 @@ void Voice::NoteOn(int note, float velocity, uint64_t age) {
   m_age = age;
   m_note = note;
   m_velocity = velocity;
-  m_frequency = NoteToFrequency(note);
+  m_lfo.Retrigger();
   m_held = true;
   m_env.NoteOn();
   m_filterEnv.NoteOn();
@@ -68,10 +71,13 @@ void Voice::Render(AudioBuffer &buffer, size_t start, size_t count,
                    double volume) {
   if (!IsActive())
     return;
-  double dt = m_frequency / m_sampleRate; // 한 샘플당 위상 증가량 (0~1 단위)
   for (size_t i = start; i < start + count; i++) {
+    double lfo = m_lfo.Next();
+    double pitch = m_note + m_lfoToPitch.Next() * lfo;
+    double dt = NoteToFrequency(pitch) / m_sampleRate;
     double cutoff = m_cutoff.Next() + m_keytrack.Next() * (m_note - 60) +
-                    m_filterEnvAmount.Next() * m_filterEnv.Next();
+                    m_filterEnvAmount.Next() * m_filterEnv.Next() +
+                    m_lfoToCutoff.Next() * lfo;
     double q = 0.5 * std::pow(32.0, m_resonance.Next());
     m_filter.SetCoefficients(NoteToFrequency(cutoff), q, m_sampleRate);
     m_filter.SetBlend(m_blend.Next());

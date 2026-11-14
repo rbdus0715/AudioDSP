@@ -58,6 +58,10 @@ private:
   double m_filterEnvAmount = kFilterEnvAmountRange.def;
   double m_keytrack = kKeytrackRange.def;
   double m_filterDrive = kFilterDriveRange.def;
+  double m_lfoRate = kLfoRateRange.def;
+  Steinberg::int32 m_lfoShape = kLfoShapeDefault;
+  double m_lfoToCutoff = kLfoToCutoffRange.def;
+  double m_lfoToPitch = kLfoToPitchRange.def;
 };
 
 } // namespace AudioDSP
