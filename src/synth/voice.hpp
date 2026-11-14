@@ -5,7 +5,9 @@
 #include "./envelope.hpp"
 #include "./filter.hpp"
 #include "./lfo.hpp"
+#include "./mod_matrix.hpp"
 #include "./smoothed_value.hpp"
+#include <array>
 #include <cstddef>
 #include <cstdint>
 
@@ -44,10 +46,13 @@ public:
   void SetFilterDecay(double sec) { m_filterEnv.SetDecay(sec); }
   void SetFilterSustain(double level) { m_filterEnv.SetSustain(level); }
   void SetFilterRelease(double sec) { m_filterEnv.SetRelease(sec); }
-  void SetLfoRate(double hz) { m_lfo.SetRate(hz); }
+  void SetLfoRate(double hz) { m_lfoRate = hz; }
   void SetLfoShape(Lfo::Shape s) { m_lfo.SetShape(s); }
   void SetLfoToCutoff(double semitones) { m_lfoToCutoff.Set(semitones); }
   void SetLfoToPitch(double semitones) { m_lfoToPitch.Set(semitones); }
+  void SetModSource(int slot, ModSource s) { m_modSource[slot] = s; }
+  void SetModDest(int slot, ModDest d) { m_modDest[slot] = d; }
+  void SetModAmount(int slot, double amount) { m_modAmount[slot].Set(amount); }
   void Render(AudioBuffer &buffer, size_t start, size_t count, double volume);
 
 private:
@@ -67,6 +72,10 @@ private:
   Lfo m_lfo;
   SmoothedValue m_lfoToCutoff;
   SmoothedValue m_lfoToPitch;
+  double m_lfoRate = 2.0;
+  std::array<ModSource, kNumModSlots> m_modSource{};
+  std::array<ModDest, kNumModSlots> m_modDest{};
+  std::array<SmoothedValue, kNumModSlots> m_modAmount;
   double m_phase = 0.0; // 0~1 (2PI x)
   float m_velocity = 0.0f;
   int m_note = -1;

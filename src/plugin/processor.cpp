@@ -50,6 +50,8 @@ tresult PLUGIN_API SynthProcessor::setupProcessing(Vst::ProcessSetup &setup) {
   m_synth->SetLfoShape(static_cast<Lfo::Shape>(m_lfoShape));
   m_synth->SetLfoToCutoff(m_lfoToCutoff);
   m_synth->SetLfoToPitch(m_lfoToPitch);
+  for (int32 slot = 0; slot < kModSlots; slot++)
+    ApplyModSlot(slot);
   m_synth->SnapParameters();
   m_buffer.SetSize(2, setup.maxSamplesPerBlock);
 
@@ -76,7 +78,21 @@ tresult PLUGIN_API SynthProcessor::process(Vst::ProcessData &data) {
       if (queue->getPoint(last, sampleOffset, value) != kResultOk)
         continue;
 
-      switch (queue->getParameterId()) {
+      Vst::ParamID id = queue->getParameterId();
+      if (IsModParam(id)) {
+        int32 slot = (id - kParamModFirst) / kModFieldsPerSlot;
+        int32 field = (id - kParamModFirst) % kModFieldsPerSlot;
+        if (field == 0)
+          m_modSource[slot] = IndexFromNormalized(value, kModSourceCount);
+        else if (field == 1)
+          m_modDest[slot] = IndexFromNormalized(value, kModDestCount);
+        else
+          m_modAmount[slot] = kModAmountRange.ToPlain(value);
+        ApplyModSlot(slot);
+        continue;
+      }
+
+      switch (id) {
       case kParamVolume:
         m_volume = kVolumeRange.ToPlain(value);
         m_synth->SetVolume(m_volume);
@@ -257,6 +273,15 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
         !s.readDouble(lfoToCutoff) || !s.readDouble(lfoToPitch))
       return kResultFalse;
   }
+  int32 modSource[kModSlots] = {};
+  int32 modDest[kModSlots] = {};
+  double modAmount[kModSlots] = {};
+  if (version >= 9) {
+    for (int32 slot = 0; slot < kModSlots; slot++)
+      if (!s.readInt32(modSource[slot]) || !s.readInt32(modDest[slot]) ||
+          !s.readDouble(modAmount[slot]))
+        return kResultFalse;
+  }
   m_volume = volume;
   m_attack = attack;
   m_release = release;
@@ -277,6 +302,11 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
   m_lfoShape = ClampLfoShape(lfoShape);
   m_lfoToCutoff = lfoToCutoff;
   m_lfoToPitch = lfoToPitch;
+  for (int32 slot = 0; slot < kModSlots; slot++) {
+    m_modSource[slot] = ClampIndex(modSource[slot], kModSourceCount);
+    m_modDest[slot] = ClampIndex(modDest[slot], kModDestCount);
+    m_modAmount[slot] = modAmount[slot];
+  }
   if (m_synth) {
     m_synth->SetVolume(m_volume);
     m_synth->SetAttack(m_attack);
@@ -298,6 +328,8 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
     m_synth->SetLfoShape(static_cast<Lfo::Shape>(m_lfoShape));
     m_synth->SetLfoToCutoff(m_lfoToCutoff);
     m_synth->SetLfoToPitch(m_lfoToPitch);
+    for (int32 slot = 0; slot < kModSlots; slot++)
+      ApplyModSlot(slot);
   }
   return kResultOk;
 }
@@ -324,7 +356,20 @@ tresult PLUGIN_API SynthProcessor::getState(IBStream *state) {
   s.writeInt32(m_lfoShape);
   s.writeDouble(m_lfoToCutoff);
   s.writeDouble(m_lfoToPitch);
+  for (int32 slot = 0; slot < kModSlots; slot++) {
+    s.writeInt32(m_modSource[slot]);
+    s.writeInt32(m_modDest[slot]);
+    s.writeDouble(m_modAmount[slot]);
+  }
   return kResultOk;
+}
+
+void SynthProcessor::ApplyModSlot(int32 slot) {
+  if (!m_synth)
+    return;
+  m_synth->SetModSource(slot, static_cast<ModSource>(m_modSource[slot]));
+  m_synth->SetModDest(slot, static_cast<ModDest>(m_modDest[slot]));
+  m_synth->SetModAmount(slot, m_modAmount[slot]);
 }
 
 } // namespace AudioDSP

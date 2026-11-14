@@ -1,6 +1,8 @@
 #include "controller.hpp"
 #include "base/source/fstreamer.h"
 #include "cids.h"
+#include "pluginterfaces/base/ustring.h"
+#include <string>
 
 using namespace Steinberg;
 
@@ -86,6 +88,26 @@ tresult PLUGIN_API SynthController::initialize(FUnknown *context) {
       STR16("LFO > Pitch"), kParamLfoToPitch, STR16("st"), kLfoToPitchRange.min,
       kLfoToPitchRange.max, kLfoToPitchRange.def));
 
+  for (int32 slot = 0; slot < kModSlots; slot++) {
+    auto title = [slot](const char *field) {
+      std::string s = "Mod " + std::to_string(slot + 1) + " " + field;
+      return UString128(s.c_str());
+    };
+    auto *src = new Vst::StringListParameter(title("Source"), ModParamId(slot, 0));
+    for (auto s : {STR16("None"), STR16("LFO"), STR16("Filter Env"), STR16("Amp Env"),
+                   STR16("Velocity"), STR16("Note")})
+      src->appendString(s);
+    parameters.addParameter(src);
+    auto *dst = new Vst::StringListParameter(title("Dest"), ModParamId(slot, 1));
+    for (auto d : {STR16("None"), STR16("Cutoff"), STR16("Resonance"), STR16("Pitch"),
+                   STR16("Volume"), STR16("Drive"), STR16("Blend"), STR16("LFO Rate")})
+      dst->appendString(d);
+    parameters.addParameter(dst);
+    parameters.addParameter(new Vst::RangeParameter(
+        title("Amount"), ModParamId(slot, 2), STR16(""), kModAmountRange.min,
+        kModAmountRange.max, kModAmountRange.def));
+  }
+
   return kResultOk;
 }
 
@@ -154,6 +176,15 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
         !s.readDouble(lfoToCutoff) || !s.readDouble(lfoToPitch))
       return kResultFalse;
   }
+  int32 modSource[kModSlots] = {};
+  int32 modDest[kModSlots] = {};
+  double modAmount[kModSlots] = {};
+  if (version >= 9) {
+    for (int32 slot = 0; slot < kModSlots; slot++)
+      if (!s.readInt32(modSource[slot]) || !s.readInt32(modDest[slot]) ||
+          !s.readDouble(modAmount[slot]))
+        return kResultFalse;
+  }
 
   setParamNormalized(kParamVolume, kVolumeRange.ToNormalized(volume));
   setParamNormalized(kParamAttack, kAttackRange.ToNormalized(attack));
@@ -175,6 +206,11 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
   setParamNormalized(kParamLfoShape, LfoShapeToNormalized(lfoShape));
   setParamNormalized(kParamLfoToCutoff, kLfoToCutoffRange.ToNormalized(lfoToCutoff));
   setParamNormalized(kParamLfoToPitch, kLfoToPitchRange.ToNormalized(lfoToPitch));
+  for (int32 slot = 0; slot < kModSlots; slot++) {
+    setParamNormalized(ModParamId(slot, 0), IndexToNormalized(modSource[slot], kModSourceCount));
+    setParamNormalized(ModParamId(slot, 1), IndexToNormalized(modDest[slot], kModDestCount));
+    setParamNormalized(ModParamId(slot, 2), kModAmountRange.ToNormalized(modAmount[slot]));
+  }
 
   return kResultOk;
 }

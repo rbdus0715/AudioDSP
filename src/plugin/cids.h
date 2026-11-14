@@ -34,6 +34,8 @@ enum ParamIDs : Steinberg::Vst::ParamID {
   kParamLfoShape = 17,
   kParamLfoToCutoff = 18,
   kParamLfoToPitch = 19,
+  // 모듈레이션 슬롯: 20 + slot * 3 + (0: source, 1: dest, 2: amount)
+  kParamModFirst = 20,
 };
 
 // v1: volume, attack, release
@@ -44,7 +46,8 @@ enum ParamIDs : Steinberg::Vst::ParamID {
 // v6: + filter env (a, d, s, r, amount), keytrack
 // v7: + filter drive
 // v8: + lfo rate, lfo shape (int32), lfo -> cutoff, lfo -> pitch
-const Steinberg::int32 kStateVersion = 8;
+// v9: + mod slots x4 (source int32, dest int32, amount double)
+const Steinberg::int32 kStateVersion = 9;
 struct ParamRange {
   double min, max, def;
   double ToPlain(double normalized) const {
@@ -100,5 +103,28 @@ inline Steinberg::int32 WaveformFromNormalized(double normalized) {
 }
 inline double WaveformToNormalized(Steinberg::int32 index) {
   return ClampWaveform(index) / static_cast<double>(kWaveformCount - 1);
+}
+
+constexpr Steinberg::int32 kModSlots = 4;
+constexpr Steinberg::int32 kModFieldsPerSlot = 3;
+constexpr Steinberg::int32 kModSourceCount = 6; // None, LFO, Filter Env, Amp Env, Velocity, Note
+constexpr Steinberg::int32 kModDestCount = 8; // None, Cutoff, Resonance, Pitch, Volume, Drive, Blend, LFO Rate
+constexpr ParamRange kModAmountRange{-1.0, 1.0, 0.0};
+
+inline Steinberg::Vst::ParamID ModParamId(Steinberg::int32 slot, Steinberg::int32 field) {
+  return kParamModFirst + slot * kModFieldsPerSlot + field;
+}
+inline bool IsModParam(Steinberg::Vst::ParamID id) {
+  return id >= kParamModFirst && id < kParamModFirst + kModSlots * kModFieldsPerSlot;
+}
+
+inline Steinberg::int32 ClampIndex(Steinberg::int32 index, Steinberg::int32 count) {
+  return std::clamp(index, Steinberg::int32(0), count - 1);
+}
+inline Steinberg::int32 IndexFromNormalized(double normalized, Steinberg::int32 count) {
+  return ClampIndex(static_cast<Steinberg::int32>(normalized * count), count);
+}
+inline double IndexToNormalized(Steinberg::int32 index, Steinberg::int32 count) {
+  return ClampIndex(index, count) / static_cast<double>(count - 1);
 }
 } // namespace AudioDSP

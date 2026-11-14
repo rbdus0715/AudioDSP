@@ -1,4 +1,5 @@
 #include "voice.hpp"
+#include <algorithm>
 #include <cmath>
 
 constexpr double PI = 3.14159265358979323846;
@@ -28,7 +29,10 @@ Voice::Voice(int sampleRate)
       m_resonance(sampleRate, 0.0), m_filterEnvAmount(sampleRate, 0.0),
       m_keytrack(sampleRate, 0.0), m_blend(sampleRate, 0.0),
       m_drive(sampleRate, 0.0), m_lfo(sampleRate),
-      m_lfoToCutoff(sampleRate, 0.0), m_lfoToPitch(sampleRate, 0.0) {}
+      m_lfoToCutoff(sampleRate, 0.0), m_lfoToPitch(sampleRate, 0.0),
+      m_modAmount{SmoothedValue(sampleRate, 0.0), SmoothedValue(sampleRate, 0.0),
+                  SmoothedValue(sampleRate, 0.0),
+                  SmoothedValue(sampleRate, 0.0)} {}
 
 void Voice::SnapParameters() {
   m_cutoff.Snap();
@@ -39,6 +43,8 @@ void Voice::SnapParameters() {
   m_drive.Snap();
   m_lfoToCutoff.Snap();
   m_lfoToPitch.Snap();
+  for (SmoothedValue &a : m_modAmount)
+    a.Snap();
 }
 
 void Voice::NoteOn(int note, float velocity, uint64_t age) {
@@ -73,17 +79,34 @@ void Voice::Render(AudioBuffer &buffer, size_t start, size_t count,
     return;
   for (size_t i = start; i < start + count; i++) {
     double lfo = m_lfo.Next();
-    double pitch = m_note + m_lfoToPitch.Next() * lfo;
+    double filterEnv = m_filterEnv.Next();
+    double ampEnv = m_env.Next();
+
+    double source[static_cast<int>(ModSource::COUNT)] = {
+        0.0, lfo, filterEnv, ampEnv, m_velocity, m_note / 127.0};
+    double mod[static_cast<int>(ModDest::COUNT)] = {};
+    for (int s = 0; s < kNumModSlots; s++) {
+      double amount = m_modAmount[s].Next();
+      ModDest d = m_modDest[s];
+      mod[static_cast<int>(d)] += amount * ModDestScale(d) *
+                                  source[static_cast<int>(m_modSource[s])];
+    }
+    auto M = [&](ModDest d) { return mod[static_cast<int>(d)]; };
+
+    m_lfo.SetRate(m_lfoRate * std::pow(2.0, M(ModDest::LFO_RATE)));
+    double pitch = m_note + m_lfoToPitch.Next() * lfo + M(ModDest::PITCH);
     double dt = NoteToFrequency(pitch) / m_sampleRate;
     double cutoff = m_cutoff.Next() + m_keytrack.Next() * (m_note - 60) +
-                    m_filterEnvAmount.Next() * m_filterEnv.Next() +
-                    m_lfoToCutoff.Next() * lfo;
-    double q = 0.5 * std::pow(32.0, m_resonance.Next());
+                    m_filterEnvAmount.Next() * filterEnv +
+                    m_lfoToCutoff.Next() * lfo + M(ModDest::CUTOFF);
+    double res = std::clamp(m_resonance.Next() + M(ModDest::RESONANCE), 0.0, 1.0);
+    double q = 0.5 * std::pow(32.0, res);
     m_filter.SetCoefficients(NoteToFrequency(cutoff), q, m_sampleRate);
-    m_filter.SetBlend(m_blend.Next());
-    m_filter.SetDrive(m_drive.Next());
+    m_filter.SetBlend(std::clamp(m_blend.Next() + M(ModDest::BLEND), 0.0, 2.0));
+    m_filter.SetDrive(std::clamp(m_drive.Next() + M(ModDest::DRIVE), 0.0, 20.0));
+    double gain = std::max(0.0, 1.0 + M(ModDest::VOLUME));
     double osc = m_filter.Process(kOscLevel * Oscillate(m_phase, dt)) / kOscLevel;
-    double sample = volume * m_velocity * osc * m_env.Next();
+    double sample = volume * gain * m_velocity * osc * ampEnv;
     for (int ch = 0; ch < buffer.GetNumChannels(); ch++)
       buffer.GetWritePointer(ch)[i] += sample;
     m_phase += dt;

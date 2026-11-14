@@ -62,6 +62,10 @@ private:
   Steinberg::int32 m_lfoShape = kLfoShapeDefault;
   double m_lfoToCutoff = kLfoToCutoffRange.def;
   double m_lfoToPitch = kLfoToPitchRange.def;
+  Steinberg::int32 m_modSource[kModSlots] = {};
+  Steinberg::int32 m_modDest[kModSlots] = {};
+  double m_modAmount[kModSlots] = {};
+  void ApplyModSlot(Steinberg::int32 slot);
 };
 
 } // namespace AudioDSP

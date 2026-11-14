@@ -42,6 +42,9 @@ public:
   void SetLfoShape(Lfo::Shape shape);
   void SetLfoToCutoff(double semitones);
   void SetLfoToPitch(double semitones);
+  void SetModSource(int slot, ModSource s);
+  void SetModDest(int slot, ModDest d);
+  void SetModAmount(int slot, double amount);
 
 private:
   Voice &GrabVoice();

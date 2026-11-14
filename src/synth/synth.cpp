@@ -144,3 +144,21 @@ void Synth::SetLfoToPitch(double value) {
   for (Voice &v : m_voices)
     v.SetLfoToPitch(value);
 }
+void Synth::SetModSource(int slot, ModSource value) {
+  if (slot < 0 || slot >= kNumModSlots)
+    return;
+  for (Voice &v : m_voices)
+    v.SetModSource(slot, value);
+}
+void Synth::SetModDest(int slot, ModDest value) {
+  if (slot < 0 || slot >= kNumModSlots)
+    return;
+  for (Voice &v : m_voices)
+    v.SetModDest(slot, value);
+}
+void Synth::SetModAmount(int slot, double value) {
+  if (slot < 0 || slot >= kNumModSlots)
+    return;
+  for (Voice &v : m_voices)
+    v.SetModAmount(slot, value);
+}
