@@ -39,6 +39,37 @@ tresult PLUGIN_API SynthController::initialize(FUnknown *context) {
   wave->setNormalized(WaveformToNormalized(kWaveformDefault));
   parameters.addParameter(wave);
 
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Cutoff"), kParamCutoff, STR16("st"), kCutoffRange.min,
+      kCutoffRange.max, kCutoffRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Resonance"), kParamResonance, STR16(""), kResonanceRange.min,
+      kResonanceRange.max, kResonanceRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Filter Blend"), kParamFilterBlend, STR16(""),
+      kFilterBlendRange.min, kFilterBlendRange.max, kFilterBlendRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Filter Attack"), kParamFilterAttack, STR16("s"), kFilterAttackRange.min, kFilterAttackRange.max,
+      kFilterAttackRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Filter Decay"), kParamFilterDecay, STR16("s"), kFilterDecayRange.min, kFilterDecayRange.max,
+      kFilterDecayRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Filter Sustain"), kParamFilterSustain, STR16(""), kFilterSustainRange.min, kFilterSustainRange.max,
+      kFilterSustainRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Filter Release"), kParamFilterRelease, STR16("s"), kFilterReleaseRange.min, kFilterReleaseRange.max,
+      kFilterReleaseRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Filter Env Amount"), kParamFilterEnvAmount, STR16("st"), kFilterEnvAmountRange.min, kFilterEnvAmountRange.max,
+      kFilterEnvAmountRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Keytrack"), kParamKeytrack, STR16(""), kKeytrackRange.min, kKeytrackRange.max,
+      kKeytrackRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Filter Drive"), kParamFilterDrive, STR16("dB"),
+      kFilterDriveRange.min, kFilterDriveRange.max, kFilterDriveRange.def));
+
   return kResultOk;
 }
 
@@ -67,6 +98,37 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
     if (!s.readInt32(waveform))
       return kResultFalse;
   }
+  double cutoff = kCutoffRange.def;
+  double resonance = kResonanceRange.def;
+  if (version >= 4) {
+    if (!s.readDouble(cutoff) || !s.readDouble(resonance))
+      return kResultFalse;
+  }
+  double blend = kFilterBlendRange.def;
+  if (version >= 5) {
+    if (!s.readDouble(blend))
+      return kResultFalse;
+  }
+  double filterAttack = kFilterAttackRange.def;
+  double filterDecay = kFilterDecayRange.def;
+  double filterSustain = kFilterSustainRange.def;
+  double filterRelease = kFilterReleaseRange.def;
+  double filterEnvAmount = kFilterEnvAmountRange.def;
+  double keytrack = kKeytrackRange.def;
+  if (version >= 6) {
+    if (!s.readDouble(filterAttack) ||
+        !s.readDouble(filterDecay) ||
+        !s.readDouble(filterSustain) ||
+        !s.readDouble(filterRelease) ||
+        !s.readDouble(filterEnvAmount) ||
+        !s.readDouble(keytrack))
+      return kResultFalse;
+  }
+  double drive = kFilterDriveRange.def;
+  if (version >= 7) {
+    if (!s.readDouble(drive))
+      return kResultFalse;
+  }
 
   setParamNormalized(kParamVolume, kVolumeRange.ToNormalized(volume));
   setParamNormalized(kParamAttack, kAttackRange.ToNormalized(attack));
@@ -74,6 +136,16 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
   setParamNormalized(kParamDecay, kDecayRange.ToNormalized(decay));
   setParamNormalized(kParamSustain, kSustainRange.ToNormalized(sustain));
   setParamNormalized(kParamWaveform, WaveformToNormalized(waveform));
+  setParamNormalized(kParamCutoff, kCutoffRange.ToNormalized(cutoff));
+  setParamNormalized(kParamResonance, kResonanceRange.ToNormalized(resonance));
+  setParamNormalized(kParamFilterBlend, kFilterBlendRange.ToNormalized(blend));
+  setParamNormalized(kParamFilterAttack, kFilterAttackRange.ToNormalized(filterAttack));
+  setParamNormalized(kParamFilterDecay, kFilterDecayRange.ToNormalized(filterDecay));
+  setParamNormalized(kParamFilterSustain, kFilterSustainRange.ToNormalized(filterSustain));
+  setParamNormalized(kParamFilterRelease, kFilterReleaseRange.ToNormalized(filterRelease));
+  setParamNormalized(kParamFilterEnvAmount, kFilterEnvAmountRange.ToNormalized(filterEnvAmount));
+  setParamNormalized(kParamKeytrack, kKeytrackRange.ToNormalized(keytrack));
+  setParamNormalized(kParamFilterDrive, kFilterDriveRange.ToNormalized(drive));
 
   return kResultOk;
 }

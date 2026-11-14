@@ -1,7 +1,7 @@
 #include "synth.hpp"
 #include <cmath>
 
-Synth::Synth(int sampleRate) {
+Synth::Synth(int sampleRate) : m_volume(sampleRate, 0.7) {
   m_voices.reserve(kNumVoices);
   for (int i = 0; i < kNumVoices; i++)
     m_voices.emplace_back(sampleRate);
@@ -49,16 +49,24 @@ void Synth::NoteOff(int note) {
 
 void Synth::Render(AudioBuffer &buffer, size_t start, size_t count) {
   for (Voice &v : m_voices)
-    v.Render(buffer, start, count, m_volume * kVoiceGain);
+    v.Render(buffer, start, count, kVoiceGain);
 
-  for (int ch = 0; ch < buffer.GetNumChannels(); ch++) {
-    float *out = buffer.GetWritePointer(ch);
-    for (size_t i = start; i < start + count; i++)
-      out[i] = std::tanh(out[i]);
+  for (size_t i = start; i < start + count; i++) {
+    double volume = m_volume.Next();
+    for (int ch = 0; ch < buffer.GetNumChannels(); ch++) {
+      float *out = buffer.GetWritePointer(ch);
+      out[i] = std::tanh(out[i] * volume);
+    }
   }
 }
 
-void Synth::SetVolume(double volume) { m_volume = volume; }
+void Synth::SnapParameters() {
+  m_volume.Snap();
+  for (Voice &v : m_voices)
+    v.SnapParameters();
+}
+
+void Synth::SetVolume(double volume) { m_volume.Set(volume); }
 void Synth::SetAttack(double sec) {
   for (Voice &v : m_voices)
     v.SetAttack(sec);
@@ -78,4 +86,45 @@ void Synth::SetRelease(double sec) {
 void Synth::SetWaveform(Waveform w) {
   for (Voice &v : m_voices)
     v.SetWaveform(w);
+}
+
+void Synth::SetCutoff(double value) {
+  for (Voice &v : m_voices)
+    v.SetCutoff(value);
+}
+void Synth::SetResonance(double value) {
+  for (Voice &v : m_voices)
+    v.SetResonance(value);
+}
+void Synth::SetFilterBlend(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterBlend(value);
+}
+void Synth::SetFilterEnvAmount(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterEnvAmount(value);
+}
+void Synth::SetKeytrack(double value) {
+  for (Voice &v : m_voices)
+    v.SetKeytrack(value);
+}
+void Synth::SetFilterAttack(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterAttack(value);
+}
+void Synth::SetFilterDecay(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterDecay(value);
+}
+void Synth::SetFilterSustain(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterSustain(value);
+}
+void Synth::SetFilterRelease(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterRelease(value);
+}
+void Synth::SetFilterDrive(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterDrive(value);
 }
