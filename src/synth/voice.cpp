@@ -3,7 +3,7 @@
 
 constexpr double PI = 3.14159265358979323846;
 
-static double NoteToFrequency(int note) {
+static double NoteToFrequency(double note) {
   return 440 * std::pow(2, ((note - 69) / 12.0));
 }
 
@@ -21,7 +21,10 @@ static double PolyBlep(double t, double dt) {
 }
 
 Voice::Voice(int sampleRate)
-    : m_sampleRate(sampleRate), m_env(sampleRate, 0.01, 0.3, 0.7, 0.3) {}
+    : m_sampleRate(sampleRate), m_env(sampleRate, 0.01, 0.3, 0.7, 0.3),
+      m_filterEnv(sampleRate, 0.01, 0.3, 0.0, 0.3) {}
+
+void Voice::SetResonance(double amount) { m_q = 0.5 * std::pow(32.0, amount); }
 
 void Voice::NoteOn(int note, float velocity, uint64_t age) {
   if (!IsActive())
@@ -32,16 +35,19 @@ void Voice::NoteOn(int note, float velocity, uint64_t age) {
   m_frequency = NoteToFrequency(note);
   m_held = true;
   m_env.NoteOn();
+  m_filterEnv.NoteOn();
 }
 
 void Voice::NoteOff() {
   m_held = false;
   m_env.NoteOff();
+  m_filterEnv.NoteOff();
 }
 
 void Voice::Kill() {
   m_held = false;
   m_env.Kill();
+  m_filterEnv.NoteOff();
 }
 
 void Voice::Render(AudioBuffer &buffer, size_t start, size_t count,
@@ -49,7 +55,10 @@ void Voice::Render(AudioBuffer &buffer, size_t start, size_t count,
   if (!IsActive())
     return;
   double dt = m_frequency / m_sampleRate; // 한 샘플당 위상 증가량 (0~1 단위)
+  double keyOffset = m_keytrack * (m_note - 60);
   for (size_t i = start; i < start + count; i++) {
+    double cutoff = m_cutoff + keyOffset + m_filterEnvAmount * m_filterEnv.Next();
+    m_filter.SetCoefficients(NoteToFrequency(cutoff), m_q, m_sampleRate);
     double osc = m_filter.Process(Oscillate(m_phase, dt));
     double sample = volume * m_velocity * osc * m_env.Next();
     for (int ch = 0; ch < buffer.GetNumChannels(); ch++)

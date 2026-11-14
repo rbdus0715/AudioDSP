@@ -28,10 +28,16 @@ public:
   void SetWaveform(Waveform w);
   void SetCutoff(double midiNote);
   void SetResonance(double amount);
+  void SetFilterBlend(double blend);
+  void SetFilterEnvAmount(double semitones);
+  void SetKeytrack(double amount);
+  void SetFilterAttack(double sec);
+  void SetFilterDecay(double sec);
+  void SetFilterSustain(double level);
+  void SetFilterRelease(double sec);
 
 private:
   Voice &GrabVoice();
-  void UpdateFilter();
   template <typename Pred> Voice *FindOldest(Pred pred) {
     Voice *oldest = nullptr;
     for (Voice &v : m_voices)
@@ -43,8 +49,6 @@ private:
   std::vector<Voice> m_voices;
   double m_volume = 0.7;
   uint64_t m_noteCount = 0;
-  double m_cutoff = 136.0;
-  double m_resonance = 0.0;
 };
 
 #endif

@@ -22,13 +22,22 @@ enum ParamIDs : Steinberg::Vst::ParamID {
   kParamWaveform = 5,
   kParamCutoff = 6,
   kParamResonance = 7,
+  kParamFilterBlend = 8,
+  kParamFilterAttack = 9,
+  kParamFilterDecay = 10,
+  kParamFilterSustain = 11,
+  kParamFilterRelease = 12,
+  kParamFilterEnvAmount = 13,
+  kParamKeytrack = 14,
 };
 
 // v1: volume, attack, release
 // v2: + decay, sustain
 // v3: + waveform (int32)
 // v4: + cutoff, resonance
-const Steinberg::int32 kStateVersion = 4;
+// v5: + filter blend
+// v6: + filter env (a, d, s, r, amount), keytrack
+const Steinberg::int32 kStateVersion = 6;
 struct ParamRange {
   double min, max, def;
   double ToPlain(double normalized) const {
@@ -45,6 +54,13 @@ constexpr ParamRange kDecayRange{0.001, 1.0, 0.3};
 constexpr ParamRange kSustainRange{0.0, 1.0, 0.7};
 constexpr ParamRange kCutoffRange{8.0, 136.0, 136.0};
 constexpr ParamRange kResonanceRange{0.0, 1.0, 0.0};
+constexpr ParamRange kFilterBlendRange{0.0, 2.0, 0.0};
+constexpr ParamRange kFilterAttackRange{1e-9, 1.0, 0.01};
+constexpr ParamRange kFilterDecayRange{0.001, 1.0, 0.3};
+constexpr ParamRange kFilterSustainRange{0.0, 1.0, 0.0};
+constexpr ParamRange kFilterReleaseRange{1e-9, 1.0, 0.3};
+constexpr ParamRange kFilterEnvAmountRange{-48.0, 48.0, 0.0};
+constexpr ParamRange kKeytrackRange{-1.0, 1.0, 0.0};
 
 // 파형 선택 (이산 파라미터). 순서는 Synth::Waveform 과 같아야 함
 constexpr Steinberg::int32 kWaveformCount = 4; // Sine, Saw, Square, Triangle

@@ -30,9 +30,15 @@ public:
   void SetDecay(double sec) { m_env.SetDecay(sec); }
   void SetSustain(double level) { m_env.SetSustain(level); }
   void SetRelease(double sec) { m_env.SetRelease(sec); }
-  void SetFilter(double cutoffHz, double q) {
-    m_filter.SetCoefficients(cutoffHz, q, m_sampleRate);
-  }
+  void SetFilterBlend(double blend) { m_filter.SetBlend(blend); }
+  void SetCutoff(double midiNote) { m_cutoff = midiNote; }
+  void SetResonance(double amount);
+  void SetFilterEnvAmount(double semitones) { m_filterEnvAmount = semitones; }
+  void SetKeytrack(double amount) { m_keytrack = amount; }
+  void SetFilterAttack(double sec) { m_filterEnv.SetAttack(sec); }
+  void SetFilterDecay(double sec) { m_filterEnv.SetDecay(sec); }
+  void SetFilterSustain(double level) { m_filterEnv.SetSustain(level); }
+  void SetFilterRelease(double sec) { m_filterEnv.SetRelease(sec); }
   void Render(AudioBuffer &buffer, size_t start, size_t count, double volume);
 
 private:
@@ -42,6 +48,11 @@ private:
   int m_sampleRate;
   Envelope m_env;
   SvfFilter m_filter;
+  Envelope m_filterEnv;
+  double m_cutoff = 136.0;
+  double m_q = 0.5;
+  double m_filterEnvAmount = 0.0;
+  double m_keytrack = 0.0;
   double m_phase = 0.0; // 0~1 (2PI x)
   double m_frequency = 440.0;
   float m_velocity = 0.0f;

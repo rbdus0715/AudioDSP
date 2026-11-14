@@ -5,7 +5,6 @@ Synth::Synth(int sampleRate) {
   m_voices.reserve(kNumVoices);
   for (int i = 0; i < kNumVoices; i++)
     m_voices.emplace_back(sampleRate);
-  UpdateFilter();
 }
 
 bool Synth::GenerateSamples(AudioBuffer &buffer, size_t numFrames) {
@@ -81,19 +80,39 @@ void Synth::SetWaveform(Waveform w) {
     v.SetWaveform(w);
 }
 
-void Synth::SetCutoff(double midiNote) {
-  m_cutoff = midiNote;
-  UpdateFilter();
-}
-void Synth::SetResonance(double amount) {
-  m_resonance = amount;
-  UpdateFilter();
-}
-
-// cutoff: MIDI note (8~136), resonance 0~1 -> Q 0.5~16 (Vital 과 같은 범위)
-void Synth::UpdateFilter() {
-  double hz = 440.0 * std::pow(2.0, (m_cutoff - 69.0) / 12.0);
-  double q = 0.5 * std::pow(32.0, m_resonance);
+void Synth::SetCutoff(double value) {
   for (Voice &v : m_voices)
-    v.SetFilter(hz, q);
+    v.SetCutoff(value);
+}
+void Synth::SetResonance(double value) {
+  for (Voice &v : m_voices)
+    v.SetResonance(value);
+}
+void Synth::SetFilterBlend(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterBlend(value);
+}
+void Synth::SetFilterEnvAmount(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterEnvAmount(value);
+}
+void Synth::SetKeytrack(double value) {
+  for (Voice &v : m_voices)
+    v.SetKeytrack(value);
+}
+void Synth::SetFilterAttack(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterAttack(value);
+}
+void Synth::SetFilterDecay(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterDecay(value);
+}
+void Synth::SetFilterSustain(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterSustain(value);
+}
+void Synth::SetFilterRelease(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterRelease(value);
 }

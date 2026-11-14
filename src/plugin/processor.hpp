@@ -50,6 +50,13 @@ private:
   Steinberg::int32 m_waveform = kWaveformDefault; // 0~3, Synth::Waveform 순서
   double m_cutoff = kCutoffRange.def;
   double m_resonance = kResonanceRange.def;
+  double m_filterBlend = kFilterBlendRange.def;
+  double m_filterAttack = kFilterAttackRange.def;
+  double m_filterDecay = kFilterDecayRange.def;
+  double m_filterSustain = kFilterSustainRange.def;
+  double m_filterRelease = kFilterReleaseRange.def;
+  double m_filterEnvAmount = kFilterEnvAmountRange.def;
+  double m_keytrack = kKeytrackRange.def;
 };
 
 } // namespace AudioDSP
