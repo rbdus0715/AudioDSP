@@ -2,6 +2,7 @@
 #define SYNTH_HPP
 
 #include "../iaudiosource.hpp"
+#include "./smoothed_value.hpp"
 #include "./voice.hpp"
 #include <cstdint>
 #include <vector>
@@ -19,6 +20,7 @@ public:
   void NoteOn(int note, float velocity);
   void NoteOff(int note);
   void Render(AudioBuffer &buffer, size_t start, size_t count);
+  void SnapParameters();
 
   void SetVolume(double volume);
   void SetAttack(double sec);
@@ -48,7 +50,7 @@ private:
   }
 
   std::vector<Voice> m_voices;
-  double m_volume = 0.7;
+  SmoothedValue m_volume;
   uint64_t m_noteCount = 0;
 };
 

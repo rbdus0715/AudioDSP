@@ -45,6 +45,7 @@ tresult PLUGIN_API SynthProcessor::setupProcessing(Vst::ProcessSetup &setup) {
   m_synth->SetFilterEnvAmount(m_filterEnvAmount);
   m_synth->SetKeytrack(m_keytrack);
   m_synth->SetFilterDrive(m_filterDrive);
+  m_synth->SnapParameters();
   m_buffer.SetSize(2, setup.maxSamplesPerBlock);
 
   return AudioEffect::setupProcessing(setup);
