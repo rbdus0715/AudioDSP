@@ -1,4 +1,5 @@
 #include "synth.hpp"
+#include <cmath>
 
 Synth::Synth(int sampleRate) {
   m_voices.reserve(kNumVoices);
@@ -48,7 +49,13 @@ void Synth::NoteOff(int note) {
 
 void Synth::Render(AudioBuffer &buffer, size_t start, size_t count) {
   for (Voice &v : m_voices)
-    v.Render(buffer, start, count, m_volume);
+    v.Render(buffer, start, count, m_volume * kVoiceGain);
+
+  for (int ch = 0; ch < buffer.GetNumChannels(); ch++) {
+    float *out = buffer.GetWritePointer(ch);
+    for (size_t i = start; i < start + count; i++)
+      out[i] = std::tanh(out[i]);
+  }
 }
 
 void Synth::SetVolume(double volume) { m_volume = volume; }
