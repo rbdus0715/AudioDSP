@@ -35,6 +35,8 @@ tresult PLUGIN_API SynthProcessor::setupProcessing(Vst::ProcessSetup &setup) {
   m_synth->SetDecay(m_decay);
   m_synth->SetSustain(m_sustain);
   m_synth->SetWaveform(static_cast<Synth::Waveform>(m_waveform));
+  m_synth->SetCutoff(m_cutoff);
+  m_synth->SetResonance(m_resonance);
   m_buffer.SetSize(2, setup.maxSamplesPerBlock);
 
   return AudioEffect::setupProcessing(setup);
@@ -84,6 +86,14 @@ tresult PLUGIN_API SynthProcessor::process(Vst::ProcessData &data) {
       case kParamWaveform:
         m_waveform = WaveformFromNormalized(value);
         m_synth->SetWaveform(static_cast<Synth::Waveform>(m_waveform));
+        break;
+      case kParamCutoff:
+        m_cutoff = kCutoffRange.ToPlain(value);
+        m_synth->SetCutoff(m_cutoff);
+        break;
+      case kParamResonance:
+        m_resonance = kResonanceRange.ToPlain(value);
+        m_synth->SetResonance(m_resonance);
         break;
       }
     }
@@ -145,12 +155,20 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
     if (!s.readInt32(waveform))
       return kResultFalse;
   }
+  double cutoff = kCutoffRange.def;
+  double resonance = kResonanceRange.def;
+  if (version >= 4) {
+    if (!s.readDouble(cutoff) || !s.readDouble(resonance))
+      return kResultFalse;
+  }
   m_volume = volume;
   m_attack = attack;
   m_release = release;
   m_decay = decay;
   m_sustain = sustain;
   m_waveform = ClampWaveform(waveform);
+  m_cutoff = cutoff;
+  m_resonance = resonance;
   if (m_synth) {
     m_synth->SetVolume(m_volume);
     m_synth->SetAttack(m_attack);
@@ -158,6 +176,8 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
     m_synth->SetDecay(m_decay);
     m_synth->SetSustain(m_sustain);
     m_synth->SetWaveform(static_cast<Synth::Waveform>(m_waveform));
+    m_synth->SetCutoff(m_cutoff);
+    m_synth->SetResonance(m_resonance);
   }
   return kResultOk;
 }
@@ -170,6 +190,8 @@ tresult PLUGIN_API SynthProcessor::getState(IBStream *state) {
   s.writeDouble(m_decay);
   s.writeDouble(m_sustain);
   s.writeInt32(m_waveform);
+  s.writeDouble(m_cutoff);
+  s.writeDouble(m_resonance);
   return kResultOk;
 }
 

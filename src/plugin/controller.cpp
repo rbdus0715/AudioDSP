@@ -39,6 +39,13 @@ tresult PLUGIN_API SynthController::initialize(FUnknown *context) {
   wave->setNormalized(WaveformToNormalized(kWaveformDefault));
   parameters.addParameter(wave);
 
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Cutoff"), kParamCutoff, STR16("st"), kCutoffRange.min,
+      kCutoffRange.max, kCutoffRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Resonance"), kParamResonance, STR16(""), kResonanceRange.min,
+      kResonanceRange.max, kResonanceRange.def));
+
   return kResultOk;
 }
 
@@ -67,6 +74,12 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
     if (!s.readInt32(waveform))
       return kResultFalse;
   }
+  double cutoff = kCutoffRange.def;
+  double resonance = kResonanceRange.def;
+  if (version >= 4) {
+    if (!s.readDouble(cutoff) || !s.readDouble(resonance))
+      return kResultFalse;
+  }
 
   setParamNormalized(kParamVolume, kVolumeRange.ToNormalized(volume));
   setParamNormalized(kParamAttack, kAttackRange.ToNormalized(attack));
@@ -74,6 +87,8 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
   setParamNormalized(kParamDecay, kDecayRange.ToNormalized(decay));
   setParamNormalized(kParamSustain, kSustainRange.ToNormalized(sustain));
   setParamNormalized(kParamWaveform, WaveformToNormalized(waveform));
+  setParamNormalized(kParamCutoff, kCutoffRange.ToNormalized(cutoff));
+  setParamNormalized(kParamResonance, kResonanceRange.ToNormalized(resonance));
 
   return kResultOk;
 }

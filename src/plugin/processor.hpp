@@ -48,6 +48,8 @@ private:
   double m_decay = kDecayRange.def;
   double m_sustain = kSustainRange.def;
   Steinberg::int32 m_waveform = kWaveformDefault; // 0~3, Synth::Waveform 순서
+  double m_cutoff = kCutoffRange.def;
+  double m_resonance = kResonanceRange.def;
 };
 
 } // namespace AudioDSP

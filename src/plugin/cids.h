@@ -20,12 +20,15 @@ enum ParamIDs : Steinberg::Vst::ParamID {
   kParamDecay = 3,
   kParamSustain = 4,
   kParamWaveform = 5,
+  kParamCutoff = 6,
+  kParamResonance = 7,
 };
 
 // v1: volume, attack, release
 // v2: + decay, sustain
 // v3: + waveform (int32)
-const Steinberg::int32 kStateVersion = 3;
+// v4: + cutoff, resonance
+const Steinberg::int32 kStateVersion = 4;
 struct ParamRange {
   double min, max, def;
   double ToPlain(double normalized) const {
@@ -40,6 +43,8 @@ constexpr ParamRange kAttackRange{1e-9, 1.0, 0.01};
 constexpr ParamRange kReleaseRange{1e-9, 1.0, 0.3};
 constexpr ParamRange kDecayRange{0.001, 1.0, 0.3};
 constexpr ParamRange kSustainRange{0.0, 1.0, 0.7};
+constexpr ParamRange kCutoffRange{8.0, 136.0, 136.0};
+constexpr ParamRange kResonanceRange{0.0, 1.0, 0.0};
 
 // 파형 선택 (이산 파라미터). 순서는 Synth::Waveform 과 같아야 함
 constexpr Steinberg::int32 kWaveformCount = 4; // Sine, Saw, Square, Triangle

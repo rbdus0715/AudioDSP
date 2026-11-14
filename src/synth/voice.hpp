@@ -3,6 +3,7 @@
 
 #include "../audiobuffer.hpp"
 #include "./envelope.hpp"
+#include "./filter.hpp"
 #include <cstddef>
 #include <cstdint>
 
@@ -29,6 +30,9 @@ public:
   void SetDecay(double sec) { m_env.SetDecay(sec); }
   void SetSustain(double level) { m_env.SetSustain(level); }
   void SetRelease(double sec) { m_env.SetRelease(sec); }
+  void SetFilter(double cutoffHz, double q) {
+    m_filter.SetCoefficients(cutoffHz, q, m_sampleRate);
+  }
   void Render(AudioBuffer &buffer, size_t start, size_t count, double volume);
 
 private:
@@ -37,6 +41,7 @@ private:
 
   int m_sampleRate;
   Envelope m_env;
+  SvfFilter m_filter;
   double m_phase = 0.0; // 0~1 (2PI x)
   double m_frequency = 440.0;
   float m_velocity = 0.0f;

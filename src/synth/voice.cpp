@@ -24,6 +24,8 @@ Voice::Voice(int sampleRate)
     : m_sampleRate(sampleRate), m_env(sampleRate, 0.01, 0.3, 0.7, 0.3) {}
 
 void Voice::NoteOn(int note, float velocity, uint64_t age) {
+  if (!IsActive())
+    m_filter.Reset();
   m_age = age;
   m_note = note;
   m_velocity = velocity;
@@ -48,7 +50,8 @@ void Voice::Render(AudioBuffer &buffer, size_t start, size_t count,
     return;
   double dt = m_frequency / m_sampleRate; // 한 샘플당 위상 증가량 (0~1 단위)
   for (size_t i = start; i < start + count; i++) {
-    double sample = volume * m_velocity * Oscillate(m_phase, dt) * m_env.Next();
+    double osc = m_filter.Process(Oscillate(m_phase, dt));
+    double sample = volume * m_velocity * osc * m_env.Next();
     for (int ch = 0; ch < buffer.GetNumChannels(); ch++)
       buffer.GetWritePointer(ch)[i] += sample;
     m_phase += dt;
