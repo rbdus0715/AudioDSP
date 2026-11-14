@@ -6,12 +6,19 @@ smtg_add_vst3plugin(AudioDSPSynth
     controller.hpp
     controller.cpp
     entry.cpp
+    resource/editor.uidesc
 )
 
 target_link_libraries(AudioDSPSynth
     PRIVATE
         sdk
+        vstgui_support
         synth_core
+)
+
+smtg_target_add_plugin_resources(AudioDSPSynth
+    RESOURCES
+        resource/editor.uidesc
 )
 smtg_target_setup_universal_binary(synth_core)
 
