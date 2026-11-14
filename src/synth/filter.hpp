@@ -27,14 +27,29 @@ public:
     m_high = b > 0.0 ? b : 0.0;
   }
 
-  double Process(double v0) {
+  // Vital futils::hardTanh: ±0.66 까지 직선, 그 밖은 부드럽게 ±1 로
+  static double HardTanh(double x) {
+    constexpr double kHard = 0.66;
+    double clamped = std::clamp(x, -kHard, kHard);
+    return clamped + std::tanh((x - clamped) / (1.0 - kHard)) * (1.0 - kHard);
+  }
+
+  // dB 0~20. Vital: input * drive -> svf -> hardTanh -> / sqrt(drive)
+  void SetDrive(double db) {
+    m_drive = std::pow(10.0, db / 20.0);
+    m_postGain = 1.0 / std::sqrt(m_drive);
+  }
+
+  double Process(double input) {
+    double v0 = m_drive * input;
     double v3 = v0 - m_ic2eq;
     double v1 = m_a1 * m_ic1eq + m_a2 * v3;
     double v2 = m_ic2eq + m_a2 * m_ic1eq + m_a3 * v3;
     m_ic1eq = 2.0 * v1 - m_ic1eq;
     m_ic2eq = 2.0 * v2 - m_ic2eq;
     double high = v0 - m_k * v1 - v2;
-    return m_low * v2 + m_band * v1 + m_high * high;
+    double out = m_low * v2 + m_band * v1 + m_high * high;
+    return HardTanh(out) * m_postGain;
   }
 
   void Reset() { m_ic1eq = m_ic2eq = 0.0; }
@@ -42,6 +57,7 @@ public:
 private:
   double m_a1 = 0.0, m_a2 = 0.0, m_a3 = 0.0, m_k = 2.0;
   double m_low = 1.0, m_band = 0.0, m_high = 0.0;
+  double m_drive = 1.0, m_postGain = 1.0;
   double m_ic1eq = 0.0, m_ic2eq = 0.0;
 };
 

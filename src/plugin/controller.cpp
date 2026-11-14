@@ -66,6 +66,9 @@ tresult PLUGIN_API SynthController::initialize(FUnknown *context) {
   parameters.addParameter(new Vst::RangeParameter(
       STR16("Keytrack"), kParamKeytrack, STR16(""), kKeytrackRange.min, kKeytrackRange.max,
       kKeytrackRange.def));
+  parameters.addParameter(new Vst::RangeParameter(
+      STR16("Filter Drive"), kParamFilterDrive, STR16("dB"),
+      kFilterDriveRange.min, kFilterDriveRange.max, kFilterDriveRange.def));
 
   return kResultOk;
 }
@@ -121,6 +124,11 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
         !s.readDouble(keytrack))
       return kResultFalse;
   }
+  double drive = kFilterDriveRange.def;
+  if (version >= 7) {
+    if (!s.readDouble(drive))
+      return kResultFalse;
+  }
 
   setParamNormalized(kParamVolume, kVolumeRange.ToNormalized(volume));
   setParamNormalized(kParamAttack, kAttackRange.ToNormalized(attack));
@@ -137,6 +145,7 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
   setParamNormalized(kParamFilterRelease, kFilterReleaseRange.ToNormalized(filterRelease));
   setParamNormalized(kParamFilterEnvAmount, kFilterEnvAmountRange.ToNormalized(filterEnvAmount));
   setParamNormalized(kParamKeytrack, kKeytrackRange.ToNormalized(keytrack));
+  setParamNormalized(kParamFilterDrive, kFilterDriveRange.ToNormalized(drive));
 
   return kResultOk;
 }

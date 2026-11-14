@@ -116,3 +116,7 @@ void Synth::SetFilterRelease(double value) {
   for (Voice &v : m_voices)
     v.SetFilterRelease(value);
 }
+void Synth::SetFilterDrive(double value) {
+  for (Voice &v : m_voices)
+    v.SetFilterDrive(value);
+}

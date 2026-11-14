@@ -2,6 +2,8 @@
 #include <cmath>
 
 constexpr double PI = 3.14159265358979323846;
+// Vital 오실레이터 level 기본값 (0.707^2). 필터는 이 크기를 전제로 동작
+constexpr double kOscLevel = 0.5;
 
 static double NoteToFrequency(double note) {
   return 440 * std::pow(2, ((note - 69) / 12.0));
@@ -59,7 +61,7 @@ void Voice::Render(AudioBuffer &buffer, size_t start, size_t count,
   for (size_t i = start; i < start + count; i++) {
     double cutoff = m_cutoff + keyOffset + m_filterEnvAmount * m_filterEnv.Next();
     m_filter.SetCoefficients(NoteToFrequency(cutoff), m_q, m_sampleRate);
-    double osc = m_filter.Process(Oscillate(m_phase, dt));
+    double osc = m_filter.Process(kOscLevel * Oscillate(m_phase, dt)) / kOscLevel;
     double sample = volume * m_velocity * osc * m_env.Next();
     for (int ch = 0; ch < buffer.GetNumChannels(); ch++)
       buffer.GetWritePointer(ch)[i] += sample;

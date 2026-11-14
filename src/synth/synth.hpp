@@ -29,6 +29,7 @@ public:
   void SetCutoff(double midiNote);
   void SetResonance(double amount);
   void SetFilterBlend(double blend);
+  void SetFilterDrive(double db);
   void SetFilterEnvAmount(double semitones);
   void SetKeytrack(double amount);
   void SetFilterAttack(double sec);

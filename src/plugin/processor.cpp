@@ -44,6 +44,7 @@ tresult PLUGIN_API SynthProcessor::setupProcessing(Vst::ProcessSetup &setup) {
   m_synth->SetFilterRelease(m_filterRelease);
   m_synth->SetFilterEnvAmount(m_filterEnvAmount);
   m_synth->SetKeytrack(m_keytrack);
+  m_synth->SetFilterDrive(m_filterDrive);
   m_buffer.SetSize(2, setup.maxSamplesPerBlock);
 
   return AudioEffect::setupProcessing(setup);
@@ -129,6 +130,10 @@ tresult PLUGIN_API SynthProcessor::process(Vst::ProcessData &data) {
       case kParamKeytrack:
         m_keytrack = kKeytrackRange.ToPlain(value);
         m_synth->SetKeytrack(m_keytrack);
+        break;
+      case kParamFilterDrive:
+        m_filterDrive = kFilterDriveRange.ToPlain(value);
+        m_synth->SetFilterDrive(m_filterDrive);
         break;
       }
     }
@@ -216,6 +221,11 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
         !s.readDouble(keytrack))
       return kResultFalse;
   }
+  double drive = kFilterDriveRange.def;
+  if (version >= 7) {
+    if (!s.readDouble(drive))
+      return kResultFalse;
+  }
   m_volume = volume;
   m_attack = attack;
   m_release = release;
@@ -231,6 +241,7 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
   m_filterRelease = filterRelease;
   m_filterEnvAmount = filterEnvAmount;
   m_keytrack = keytrack;
+  m_filterDrive = drive;
   if (m_synth) {
     m_synth->SetVolume(m_volume);
     m_synth->SetAttack(m_attack);
@@ -247,6 +258,7 @@ tresult PLUGIN_API SynthProcessor::setState(IBStream *state) {
     m_synth->SetFilterRelease(m_filterRelease);
     m_synth->SetFilterEnvAmount(m_filterEnvAmount);
     m_synth->SetKeytrack(m_keytrack);
+    m_synth->SetFilterDrive(m_filterDrive);
   }
   return kResultOk;
 }
@@ -268,6 +280,7 @@ tresult PLUGIN_API SynthProcessor::getState(IBStream *state) {
   s.writeDouble(m_filterRelease);
   s.writeDouble(m_filterEnvAmount);
   s.writeDouble(m_keytrack);
+  s.writeDouble(m_filterDrive);
   return kResultOk;
 }
 

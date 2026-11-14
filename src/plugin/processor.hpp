@@ -57,6 +57,7 @@ private:
   double m_filterRelease = kFilterReleaseRange.def;
   double m_filterEnvAmount = kFilterEnvAmountRange.def;
   double m_keytrack = kKeytrackRange.def;
+  double m_filterDrive = kFilterDriveRange.def;
 };
 
 } // namespace AudioDSP

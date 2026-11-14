@@ -31,6 +31,7 @@ public:
   void SetSustain(double level) { m_env.SetSustain(level); }
   void SetRelease(double sec) { m_env.SetRelease(sec); }
   void SetFilterBlend(double blend) { m_filter.SetBlend(blend); }
+  void SetFilterDrive(double db) { m_filter.SetDrive(db); }
   void SetCutoff(double midiNote) { m_cutoff = midiNote; }
   void SetResonance(double amount);
   void SetFilterEnvAmount(double semitones) { m_filterEnvAmount = semitones; }
