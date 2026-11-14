@@ -1,5 +1,6 @@
 #ifndef ENVELOPE_HPP
 #define ENVELOPE_HPP
+#include <cmath>
 
 class Envelope {
 public:
@@ -24,7 +25,8 @@ public:
     switch (m_stage) {
     case Stage::ATTACK:
       m_position += 1 / (m_attackSec * m_sampleRate);
-      m_level = m_startValue + (1.0 - m_startValue) * m_position;
+      m_level = m_startValue +
+                (1.0 - m_startValue) * Curve(m_position, m_attackPower);
       if (m_position >= 1.0) {
         m_level = 1.0;
         EnterStage(Stage::DECAY);
@@ -32,7 +34,7 @@ public:
       break;
     case Stage::DECAY:
       m_position += 1.0 / (m_decaySec * m_sampleRate);
-      m_level = 1.0 - (1.0 - m_sustainLevel) * m_position;
+      m_level = 1.0 - (1.0 - m_sustainLevel) * Curve(m_position, m_decayPower);
       if (m_position >= 1.0) {
         m_level = m_sustainLevel;
         EnterStage(Stage::SUSTAIN);
@@ -40,7 +42,7 @@ public:
       break;
     case Stage::RELEASE:
       m_position += 1.0 / (m_releaseSec * m_sampleRate);
-      m_level = m_startValue * (1.0 - m_position);
+      m_level = m_startValue * (1.0 - Curve(m_position, m_releasePower));
       if (m_position >= 1.0) {
         m_level = 0.0;
         EnterStage(Stage::IDLE);
@@ -59,6 +61,14 @@ public:
   void SetDecay(double sec) { m_decaySec = sec; }
   void SetSustain(double level) { m_sustainLevel = level; }
 
+  static double Curve(double x, double power) {
+    if (std::fabs(power) < 0.01)
+      return x;
+    // if x:0 -> 0
+    // if x:1 -> 1
+    return (std::exp(power * x) - 1.0) / (std::exp(power) - 1.0);
+  }
+
 private:
   int m_sampleRate;
   double m_attackSec;
@@ -69,6 +79,11 @@ private:
   double m_level = 0.0;
   double m_position = 0.0;
   double m_startValue = 0.0;
+
+  // power member
+  double m_attackPower = 0.0;
+  double m_decayPower = -2.0;
+  double m_releasePower = -2.0;
 };
 
 #endif
