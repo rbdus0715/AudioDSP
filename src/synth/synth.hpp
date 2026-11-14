@@ -6,14 +6,12 @@
 #include <cstdint>
 #include <vector>
 
-// 보이스들을 관리하는 쪽 (폴리포니).
-// 공유 파라미터(파형, ADSR, 볼륨)를 받아서 모든 보이스에 뿌려줌.
-// Vital: synthesis/framework/voice_handler.cpp 의 VoiceHandler
 class Synth : public IAudioSource {
 public:
-  using Waveform = ::Waveform; // Synth::Waveform 으로도 계속 쓸 수 있게
+  using Waveform = ::Waveform; 
   static constexpr int kMaxPolyphony = 8;
   static constexpr int kNumVoices = kMaxPolyphony + 1;
+  static constexpr double kVoiceGain = 0.35355339059327373; // 1/√kMaxPolyphony
 
   explicit Synth(int sampleRate);
 
@@ -30,7 +28,6 @@ public:
   void SetWaveform(Waveform w);
 
 private:
-  // 새 음에 쓸 보이스 고르기
   Voice &GrabVoice();
   template <typename Pred> Voice *FindOldest(Pred pred) {
     Voice *oldest = nullptr;
@@ -41,7 +38,7 @@ private:
   }
 
   std::vector<Voice> m_voices;
-  double m_volume = 0.2;
+  double m_volume = 0.7;
   uint64_t m_noteCount = 0;
 };
 

@@ -35,7 +35,7 @@ struct ParamRange {
     return (plain - min) / (max - min);
   }
 };
-constexpr ParamRange kVolumeRange{0.0, 1.0, 0.2};
+constexpr ParamRange kVolumeRange{0.0, 1.0, 0.7};
 constexpr ParamRange kAttackRange{1e-9, 1.0, 0.01};
 constexpr ParamRange kReleaseRange{1e-9, 1.0, 0.3};
 constexpr ParamRange kDecayRange{0.001, 1.0, 0.3};
