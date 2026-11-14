@@ -50,9 +50,6 @@ tresult PLUGIN_API SynthController::setComponentState(IBStream *state) {
     if (!s.readDouble(decay) || !s.readDouble(sustain))
       return kResultFalse;
   }
-  if (!s.readInt32(version) || !s.readDouble(volume) || !s.readDouble(attack) ||
-      !s.readDouble(release))
-    return kResultFalse;
 
   setParamNormalized(kParamVolume, kVolumeRange.ToNormalized(volume));
   setParamNormalized(kParamAttack, kAttackRange.ToNormalized(attack));

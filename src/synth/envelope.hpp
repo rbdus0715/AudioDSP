@@ -9,34 +9,41 @@ public:
            double sustainLevel, double releaseSec)
       : m_sampleRate(sampleRate), m_attackSec(attackSec), m_decaySec(decaySec),
         m_sustainLevel(sustainLevel), m_releaseSec(releaseSec) {}
-
-  void NoteOn() { m_stage = Stage::ATTACK; }
+  void EnterStage(Stage stage) {
+    m_stage = stage;
+    m_position = 0.0;
+    m_startValue = m_level;
+  }
+  void NoteOn() { EnterStage(Stage::ATTACK); }
   void NoteOff() {
     if (m_stage != Stage::IDLE)
-      m_stage = Stage::RELEASE;
+      EnterStage(Stage::RELEASE);
   }
   bool IsActive() const { return m_stage != Stage::IDLE; }
   double Next() {
     switch (m_stage) {
     case Stage::ATTACK:
-      m_level += 1 / (m_attackSec * m_sampleRate);
-      if (m_level >= 1.0) {
+      m_position += 1 / (m_attackSec * m_sampleRate);
+      m_level = m_startValue + (1.0 - m_startValue) * m_position;
+      if (m_position >= 1.0) {
         m_level = 1.0;
-        m_stage = Stage::DECAY;
+        EnterStage(Stage::DECAY);
       }
       break;
     case Stage::DECAY:
-      m_level -= (1.0 - m_sustainLevel) / (m_decaySec * m_sampleRate);
-      if (m_level <= m_sustainLevel) {
+      m_position += 1.0 / (m_decaySec * m_sampleRate);
+      m_level = 1.0 - (1.0 - m_sustainLevel) * m_position;
+      if (m_position >= 1.0) {
         m_level = m_sustainLevel;
-        m_stage = Stage::SUSTAIN;
+        EnterStage(Stage::SUSTAIN);
       }
       break;
     case Stage::RELEASE:
-      m_level -= 1 / (m_releaseSec * m_sampleRate);
-      if (m_level <= 0.0) {
+      m_position += 1.0 / (m_releaseSec * m_sampleRate);
+      m_level = m_startValue * (1.0 - m_position);
+      if (m_position >= 1.0) {
         m_level = 0.0;
-        m_stage = Stage::IDLE;
+        EnterStage(Stage::IDLE);
       }
       break;
     case Stage::SUSTAIN:
@@ -60,6 +67,8 @@ private:
   double m_sustainLevel;
   Stage m_stage = Stage::IDLE;
   double m_level = 0.0;
+  double m_position = 0.0;
+  double m_startValue = 0.0;
 };
 
 #endif
