@@ -23,14 +23,24 @@ static double PolyBlep(double t, double dt) {
 Voice::Voice(int sampleRate)
     : m_sampleRate(sampleRate), m_env(sampleRate, 0.01, 0.3, 0.7, 0.3) {}
 
-void Voice::NoteOn(int note, float velocity) {
+void Voice::NoteOn(int note, float velocity, uint64_t age) {
+  m_age = age;
   m_note = note;
   m_velocity = velocity;
   m_frequency = NoteToFrequency(note);
+  m_held = true;
   m_env.NoteOn();
 }
 
-void Voice::NoteOff() { m_env.NoteOff(); }
+void Voice::NoteOff() {
+  m_held = false;
+  m_env.NoteOff();
+}
+
+void Voice::Kill() {
+  m_held = false;
+  m_env.Kill();
+}
 
 void Voice::Render(AudioBuffer &buffer, size_t start, size_t count,
                    double volume) {
