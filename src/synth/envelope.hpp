@@ -4,7 +4,8 @@
 
 class Envelope {
 public:
-  enum class Stage { IDLE, ATTACK, DECAY, SUSTAIN, RELEASE };
+  enum class Stage { IDLE, ATTACK, DECAY, SUSTAIN, RELEASE, KILL };
+  static constexpr double kKillSec = 0.02;
 
   Envelope(int sampleRate, double attackSec, double decaySec,
            double sustainLevel, double releaseSec)
@@ -17,10 +18,15 @@ public:
   }
   void NoteOn() { EnterStage(Stage::ATTACK); }
   void NoteOff() {
-    if (m_stage != Stage::IDLE)
+    if (m_stage != Stage::IDLE && m_stage != Stage::KILL)
       EnterStage(Stage::RELEASE);
   }
+  void Kill() {
+    if (m_stage != Stage::IDLE)
+      EnterStage(Stage::KILL);
+  }
   bool IsActive() const { return m_stage != Stage::IDLE; }
+  bool IsKilling() const { return m_stage == Stage::KILL; }
   double Next() {
     switch (m_stage) {
     case Stage::ATTACK:
@@ -43,6 +49,14 @@ public:
     case Stage::RELEASE:
       m_position += 1.0 / (m_releaseSec * m_sampleRate);
       m_level = m_startValue * (1.0 - Curve(m_position, m_releasePower));
+      if (m_position >= 1.0) {
+        m_level = 0.0;
+        EnterStage(Stage::IDLE);
+      }
+      break;
+    case Stage::KILL:
+      m_position += 1.0 / (kKillSec * m_sampleRate);
+      m_level = m_startValue * (1.0 - m_position);
       if (m_position >= 1.0) {
         m_level = 0.0;
         EnterStage(Stage::IDLE);

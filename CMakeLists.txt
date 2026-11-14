@@ -17,6 +17,7 @@ endif()
 add_library(synth_core STATIC
     src/audiobuffer.cpp
     src/synth/synth.cpp
+    src/synth/voice.cpp
 )
 target_include_directories(synth_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set_target_properties(synth_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
